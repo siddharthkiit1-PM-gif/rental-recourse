@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="1200" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  <rect x="1020" y="15" width="140" height="34" rx="6" fill="#2c2c2a"/>
+  <text x="1090" y="37" text-anchor="middle" font-size="14" font-weight="500" fill="#ffffff">Download PDF</text>
+  
+  <!-- LEFT PANEL: Analysis -->
+  <rect x="30" y="90" width="380" height="850" rx="12" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Situation section -->
+  <text x="55" y="130" font-size="12" font-weight="500" fill="#888780">YOUR SITUATION</text>
+  <text x="55" y="165" font-size="18" font-weight="500" fill="#2c2c2a">Non-return with vague</text>
+  <text x="55" y="188" font-size="18" font-weight="500" fill="#2c2c2a">deductions</text>
+  
+  <line x1="55" y1="220" x2="385" y2="220" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Forum section -->
+  <text x="55" y="255" font-size="12" font-weight="500" fill="#888780">WHERE TO FILE</text>
+  <text x="55" y="285" font-size="16" fill="#2c2c2a">Consumer Commission,</text>
+  <text x="55" y="306" font-size="16" fill="#2c2c2a">Bangalore Urban</text>
+  <text x="55" y="330" font-size="13" fill="#5f5e5a">(claim value ₹95,000 under</text>
+  <text x="55" y="348" font-size="13" fill="#5f5e5a">₹50L District limit)</text>
+  
+  <line x1="55" y1="380" x2="385" y2="380" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Legal basis -->
+  <text x="55" y="415" font-size="12" font-weight="500" fill="#888780">LEGAL BASIS</text>
+  <text x="55" y="445" font-size="13" fill="#2c2c2a">• CPA 2019, Sec 2(11)</text>
+  <text x="70" y="463" font-size="12" fill="#5f5e5a">deficiency of service</text>
+  <text x="55" y="485" font-size="13" fill="#2c2c2a">• Karnataka Rent Act, Sec 12</text>
+  <text x="70" y="503" font-size="12" fill="#5f5e5a">deposit refund timeline</text>
+  <text x="55" y="525" font-size="13" fill="#2c2c2a">• MTA 2021, Sec 11</text>
+  <text x="70" y="543" font-size="12" fill="#5f5e5a">deposit cap</text>
+  
+  <line x1="55" y1="575" x2="385" y2="575" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Evidence checklist -->
+  <text x="55" y="610" font-size="12" font-weight="500" fill="#888780">EVIDENCE TO ATTACH</text>
+  <rect x="55" y="625" width="14" height="14" rx="3" fill="#2c2c2a"/>
+  <text x="63" y="636" font-size="11" fill="#ffffff">✓</text>
+  <text x="80" y="637" font-size="13" fill="#2c2c2a">Rent agreement</text>
+  
+  <rect x="55" y="650" width="14" height="14" rx="3" fill="#2c2c2a"/>
+  <text x="63" y="661" font-size="11" fill="#ffffff">✓</text>
+  <text x="80" y="662" font-size="13" fill="#2c2c2a">Bank transfer proof</text>
+  
+  <rect x="55" y="675" width="14" height="14" rx="3" fill="#2c2c2a"/>
+  <text x="63" y="686" font-size="11" fill="#ffffff">✓</text>
+  <text x="80" y="687" font-size="13" fill="#2c2c2a">WhatsApp chats</text>
+  
+  <rect x="55" y="700" width="14" height="14" rx="3" fill="#ffffff" stroke="#5f5e5a" stroke-width="1"/>
+  <text x="80" y="712" font-size="13" fill="#5f5e5a">Move-out photos</text>
+  <text x="95" y="730" font-size="12" fill="#888780">recommended</text>
+  
+  <line x1="55" y1="765" x2="385" y2="765" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Next steps -->
+  <text x="55" y="800" font-size="12" font-weight="500" fill="#888780">NEXT STEPS</text>
+  <text x="55" y="828" font-size="13" fill="#2c2c2a">1. Send by registered post</text>
+  <text x="55" y="850" font-size="13" fill="#2c2c2a">2. Wait 15 days</text>
+  <text x="55" y="872" font-size="13" fill="#2c2c2a">3. File at Consumer Commission</text>
+  <text x="70" y="890" font-size="12" fill="#5f5e5a">via e-Jagriti</text>
+  
+  
+  <!-- RIGHT PANEL: Draft preview -->
+  <rect x="440" y="90" width="730" height="850" rx="12" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Draft header -->
+  <text x="465" y="135" font-size="18" font-weight="500" fill="#2c2c2a">LEGAL NOTICE</text>
+  <line x1="465" y1="155" x2="1145" y2="155" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Draft body -->
+  <text x="465" y="185" font-size="13" fill="#5f5e5a">Under Section 80 of the Code of Civil Procedure, 1908</text>
+  
+  <text x="465" y="225" font-size="14" fill="#2c2c2a">From: [Your name]</text>
+  <text x="465" y="250" font-size="14" fill="#2c2c2a">To: [Landlord name and address]</text>
+  <text x="465" y="275" font-size="14" fill="#2c2c2a">Date: [Auto-filled]</text>
+  
+  <text x="465" y="315" font-size="14" font-weight="500" fill="#2c2c2a">Subject: Notice for return of security deposit of ₹95,000</text>
+  
+  <text x="465" y="360" font-size="14" fill="#2c2c2a">Sir/Madam,</text>
+  
+  <text x="465" y="400" font-size="13" fill="#2c2c2a">1. That my client took the premises situated at</text>
+  <text x="465" y="420" font-size="13" fill="#2c2c2a">   [address] on rent from [start date] to [end date].</text>
+  
+  <text x="465" y="460" font-size="13" fill="#2c2c2a">2. That under Section 12 of the Karnataka Rent Act,</text>
+  <text x="465" y="480" font-size="13" fill="#2c2c2a">   2001, the landlord is required to return the security</text>
+  <text x="465" y="500" font-size="13" fill="#2c2c2a">   deposit within 30 days of vacation, after deducting</text>
+  <text x="465" y="520" font-size="13" fill="#2c2c2a">   only genuine damages.</text>
+  
+  <text x="465" y="560" font-size="13" fill="#2c2c2a">3. That normal wear and tear is not a permissible</text>
+  <text x="465" y="580" font-size="13" fill="#2c2c2a">   deduction under settled law.</text>
+  
+  <text x="465" y="620" font-size="13" fill="#2c2c2a">4. That your refusal to return the deposit despite</text>
+  <text x="465" y="640" font-size="13" fill="#2c2c2a">   repeated requests constitutes deficiency of service</text>
+  <text x="465" y="660" font-size="13" fill="#2c2c2a">   under Section 2(11) of the Consumer Protection Act,</text>
+  <text x="465" y="680" font-size="13" fill="#2c2c2a">   2019.</text>
+  
+  <text x="465" y="720" font-size="13" fill="#5f5e5a">[Draft continues...]</text>
+  
+  <!-- Edit button -->
+  <rect x="465" y="870" width="140" height="42" rx="8" fill="#ffffff" stroke="#2c2c2a" stroke-width="1"/>
+  <text x="535" y="896" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a">Edit draft</text>
+  
+  <!-- Screen label -->
+  <rect x="0" y="970" width="1200" height="30" fill="#f1efe8"/>
+  <text x="600" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 4 — Results (analysis left, draft right)</text>
+</svg>

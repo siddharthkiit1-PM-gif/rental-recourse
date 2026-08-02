@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="800" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  
+  <!-- Success icon -->
+  <circle cx="60" cy="140" r="24" fill="#2c2c2a"/>
+  <text x="60" y="147" text-anchor="middle" font-size="20" font-weight="500" fill="#ffffff">✓</text>
+  <text x="100" y="147" font-size="18" font-weight="500" fill="#2c2c2a">Downloaded</text>
+  
+  <!-- Title -->
+  <text x="60" y="220" font-size="36" font-weight="500" fill="#2c2c2a">Your notice is ready.</text>
+  
+  <!-- Next steps -->
+  <text x="60" y="290" font-size="14" font-weight="500" fill="#888780">NEXT STEPS</text>
+  
+  <text x="60" y="330" font-size="15" fill="#2c2c2a">1. Print, sign, and send to your landlord via registered</text>
+  <text x="60" y="350" font-size="15" fill="#2c2c2a">   post (Speed Post also acceptable)</text>
+  
+  <text x="60" y="390" font-size="15" fill="#2c2c2a">2. Keep the tracking receipt as proof of dispatch</text>
+  
+  <text x="60" y="430" font-size="15" fill="#2c2c2a">3. Wait 15 days for a response</text>
+  
+  <text x="60" y="470" font-size="15" fill="#2c2c2a">4. If ignored, file at Consumer Commission via e-Jagriti</text>
+  <text x="60" y="490" font-size="15" fill="#2c2c2a">   (link below)</text>
+  
+  <!-- Filing link -->
+  <rect x="60" y="520" width="360" height="50" rx="8" fill="#ffffff" stroke="#2c2c2a" stroke-width="1"/>
+  <text x="80" y="551" font-size="15" fill="#2c2c2a">→ How to file at e-Jagriti</text>
+  <text x="380" y="551" text-anchor="end" font-size="12" fill="#888780">opens new tab</text>
+  
+  <!-- Divider -->
+  <line x1="60" y1="640" x2="740" y2="640" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- Feedback -->
+  <text x="60" y="690" font-size="18" font-weight="500" fill="#2c2c2a">Was this useful?</text>
+  
+  <text x="60" y="750" font-size="32" fill="#888780">☆ ☆ ☆ ☆ ☆</text>
+  
+  <text x="60" y="810" font-size="13" fill="#888780">Anonymous. Helps us improve.</text>
+  
+  <!-- Share prompt -->
+  <line x1="60" y1="860" x2="740" y2="860" stroke="#e5e5e0" stroke-width="1"/>
+  <rect x="60" y="890" width="360" height="50" rx="8" fill="#ffffff" stroke="#2c2c2a" stroke-width="1"/>
+  <text x="80" y="921" font-size="15" fill="#2c2c2a">Tell a friend who's had this problem →</text>
+  
+  <!-- Screen label -->
+  <rect x="0" y="970" width="800" height="30" fill="#f1efe8"/>
+  <text x="400" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 6 — Post-download (feedback + share)</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="800" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  
+  <!-- Title -->
+  <text x="60" y="160" font-size="32" font-weight="500" fill="#2c2c2a">Working on your notice...</text>
+  
+  <!-- Step 1 - Complete -->
+  <circle cx="80" cy="260" r="10" fill="#2c2c2a"/>
+  <circle cx="80" cy="260" r="4" fill="#ffffff"/>
+  <text x="110" y="266" font-size="17" font-weight="500" fill="#2c2c2a">Classifying your situation</text>
+  <text x="110" y="290" font-size="14" fill="#5f5e5a">→ Non-return with vague deductions</text>
+  
+  <!-- Step 2 - Complete -->
+  <circle cx="80" cy="360" r="10" fill="#2c2c2a"/>
+  <circle cx="80" cy="360" r="4" fill="#ffffff"/>
+  <text x="110" y="366" font-size="17" font-weight="500" fill="#2c2c2a">Selecting the right forum</text>
+  <text x="110" y="390" font-size="14" fill="#5f5e5a">→ Legal notice + Consumer Commission</text>
+  <text x="110" y="410" font-size="14" fill="#5f5e5a">   (deficiency of service under CPA 2019, Sec 2(11))</text>
+  
+  <!-- Step 3 - In progress -->
+  <circle cx="80" cy="475" r="10" fill="#ffffff" stroke="#2c2c2a" stroke-width="2"/>
+  <text x="110" y="481" font-size="17" fill="#5f5e5a">Retrieving relevant law...</text>
+  
+  <!-- Step 4 - Pending -->
+  <circle cx="80" cy="540" r="10" fill="#ffffff" stroke="#888780" stroke-width="1"/>
+  <text x="110" y="546" font-size="17" fill="#888780">Drafting your notice...</text>
+  
+  <!-- Step 5 - Pending -->
+  <circle cx="80" cy="600" r="10" fill="#ffffff" stroke="#888780" stroke-width="1"/>
+  <text x="110" y="606" font-size="17" fill="#888780">Verifying citations...</text>
+  
+  <!-- Time note -->
+  <text x="60" y="720" font-size="13" fill="#888780">This usually takes 30-60 seconds.</text>
+  
+  <!-- Screen label -->
+  <rect x="0" y="970" width="800" height="30" fill="#f1efe8"/>
+  <text x="400" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 3 — Processing (agent state streamed live)</text>
+</svg>

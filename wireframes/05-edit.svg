@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="800" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  <rect x="620" y="15" width="160" height="34" rx="6" fill="#2c2c2a"/>
+  <text x="700" y="37" text-anchor="middle" font-size="13" font-weight="500" fill="#ffffff">Save and download</text>
+  
+  <!-- Instruction -->
+  <text x="40" y="105" font-size="14" fill="#5f5e5a">Edit the notice below. Add facts we missed, adjust names, or refine tone.</text>
+  
+  <!-- Textarea -->
+  <rect x="40" y="130" width="720" height="740" rx="8" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <text x="65" y="170" font-size="15" font-weight="500" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">LEGAL NOTICE</text>
+  <text x="65" y="200" font-size="13" fill="#5f5e5a" font-family="ui-serif, Georgia, serif">Under Section 80 of the Code of Civil Procedure, 1908</text>
+  
+  <text x="65" y="240" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">From: [Your name]</text>
+  <text x="65" y="265" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">To: [Landlord name]</text>
+  
+  <text x="65" y="305" font-size="13" font-weight="500" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">Subject: Notice for return of security deposit</text>
+  
+  <text x="65" y="345" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">Sir/Madam,</text>
+  
+  <text x="65" y="385" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">1. That my client took the premises at [address]</text>
+  <text x="65" y="405" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">   on rent from [date] to [date].</text>
+  
+  <text x="65" y="445" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">2. That under Section 12 of the Karnataka Rent Act,</text>
+  <text x="65" y="465" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">   the landlord is required to return the deposit</text>
+  <text x="65" y="485" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">   within 30 days.</text>
+  
+  <text x="65" y="525" font-size="13" fill="#2c2c2a" font-family="ui-serif, Georgia, serif">[Cursor position for user editing]</text>
+  
+  <!-- Cursor indicator -->
+  <line x1="290" y1="510" x2="290" y2="535" stroke="#2c2c2a" stroke-width="2"/>
+  
+  <!-- Back link -->
+  <text x="40" y="920" font-size="15" fill="#5f5e5a">← Back to results</text>
+  
+  <!-- Screen label -->
+  <rect x="0" y="970" width="800" height="30" fill="#f1efe8"/>
+  <text x="400" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 5 — Edit draft (freeform textarea)</text>
+</svg>

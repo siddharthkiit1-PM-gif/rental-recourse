@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="800" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  <text x="700" y="38" text-anchor="end" font-size="13" fill="#5f5e5a">Step 2 of 6</text>
+  <text x="760" y="38" text-anchor="end" font-size="13" fill="#5f5e5a">Step 2 of 6</text>
+  
+  <!-- Progress bar -->
+  <circle cx="40" cy="90" r="6" fill="#2c2c2a"/>
+  <circle cx="60" cy="90" r="6" fill="#2c2c2a"/>
+  <circle cx="80" cy="90" r="6" fill="#ffffff" stroke="#5f5e5a" stroke-width="1"/>
+  <circle cx="100" cy="90" r="6" fill="#ffffff" stroke="#5f5e5a" stroke-width="1"/>
+  <circle cx="120" cy="90" r="6" fill="#ffffff" stroke="#5f5e5a" stroke-width="1"/>
+  <circle cx="140" cy="90" r="6" fill="#ffffff" stroke="#5f5e5a" stroke-width="1"/>
+  
+  <!-- Question -->
+  <text x="60" y="200" font-size="32" font-weight="500" fill="#2c2c2a">Where was the property?</text>
+  
+  <!-- State field -->
+  <text x="60" y="280" font-size="14" fill="#5f5e5a">State</text>
+  <rect x="60" y="295" width="400" height="52" rx="8" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="80" y="326" font-size="16" fill="#2c2c2a">Karnataka</text>
+  <text x="440" y="326" text-anchor="end" font-size="16" fill="#888780">▼</text>
+  
+  <!-- City field -->
+  <text x="60" y="400" font-size="14" fill="#5f5e5a">City</text>
+  <rect x="60" y="415" width="400" height="52" rx="8" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="80" y="446" font-size="16" fill="#2c2c2a">Bangalore</text>
+  
+  <!-- Hint -->
+  <text x="60" y="510" font-size="13" fill="#888780">We use this to pick the right state rent law.</text>
+  
+  <!-- Navigation -->
+  <text x="60" y="920" font-size="16" fill="#5f5e5a">← Back</text>
+  <rect x="600" y="895" width="140" height="48" rx="8" fill="#2c2c2a"/>
+  <text x="670" y="925" text-anchor="middle" font-size="16" font-weight="500" fill="#ffffff">Next →</text>
+  
+  <!-- Screen label -->
+  <rect x="0" y="970" width="800" height="30" fill="#f1efe8"/>
+  <text x="400" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 2 — Intake (Step 2 of 6 shown)</text>
+</svg>

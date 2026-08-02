@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" font-family="ui-sans-serif, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="800" height="1000" fill="#fafaf7"/>
+  
+  <!-- Header bar -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="40" y="38" font-size="20" font-weight="500" fill="#2c2c2a">Recourse</text>
+  <text x="640" y="38" font-size="13" fill="#5f5e5a">About</text>
+  <text x="700" y="38" font-size="13" fill="#5f5e5a">Not legal advice</text>
+  
+  <!-- Hero section -->
+  <text x="60" y="180" font-size="42" font-weight="500" fill="#2c2c2a">Landlord not returning</text>
+  <text x="60" y="230" font-size="42" font-weight="500" fill="#2c2c2a">your deposit?</text>
+  
+  <text x="60" y="290" font-size="18" fill="#444441">Free tool that drafts a legal notice grounded in the</text>
+  <text x="60" y="315" font-size="18" fill="#444441">Karnataka Rent Act, Model Tenancy Act, and Consumer</text>
+  <text x="60" y="340" font-size="18" fill="#444441">Protection Act. Takes ~5 minutes.</text>
+  
+  <!-- CTA button -->
+  <rect x="60" y="380" width="280" height="56" rx="8" fill="#2c2c2a"/>
+  <text x="200" y="415" text-anchor="middle" font-size="16" font-weight="500" fill="#ffffff">Get my notice drafted →</text>
+  
+  <text x="60" y="470" font-size="13" fill="#888780">No signup. No payment. Session only.</text>
+  
+  <!-- Divider -->
+  <line x1="60" y1="530" x2="740" y2="530" stroke="#e5e5e0" stroke-width="1"/>
+  
+  <!-- How it works -->
+  <text x="60" y="590" font-size="22" font-weight="500" fill="#2c2c2a">How it works</text>
+  
+  <!-- Step 1 -->
+  <circle cx="80" cy="650" r="18" fill="#ffffff" stroke="#2c2c2a" stroke-width="1.5"/>
+  <text x="80" y="656" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a">1</text>
+  <text x="120" y="655" font-size="16" fill="#2c2c2a">Describe what happened (5 min)</text>
+  
+  <!-- Step 2 -->
+  <circle cx="80" cy="700" r="18" fill="#ffffff" stroke="#2c2c2a" stroke-width="1.5"/>
+  <text x="80" y="706" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a">2</text>
+  <text x="120" y="705" font-size="16" fill="#2c2c2a">We classify your situation and pick the right forum</text>
+  
+  <!-- Step 3 -->
+  <circle cx="80" cy="750" r="18" fill="#ffffff" stroke="#2c2c2a" stroke-width="1.5"/>
+  <text x="80" y="756" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a">3</text>
+  <text x="120" y="755" font-size="16" fill="#2c2c2a">We draft your legal notice grounded in statute</text>
+  
+  <!-- Step 4 -->
+  <circle cx="80" cy="800" r="18" fill="#ffffff" stroke="#2c2c2a" stroke-width="1.5"/>
+  <text x="80" y="806" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a">4</text>
+  <text x="120" y="805" font-size="16" fill="#2c2c2a">Download PDF, send via registered post</text>
+  
+  <!-- Disclaimer -->
+  <line x1="60" y1="880" x2="740" y2="880" stroke="#e5e5e0" stroke-width="1"/>
+  <text x="60" y="920" font-size="13" fill="#888780">This is an informational drafting tool. Not legal advice.</text>
+  <text x="60" y="942" font-size="13" fill="#888780">For complex cases, consult a lawyer.</text>
+  
+  <!-- Screen label (dev annotation) -->
+  <rect x="0" y="970" width="800" height="30" fill="#f1efe8"/>
+  <text x="400" y="989" text-anchor="middle" font-size="11" fill="#888780">Screen 1 — Landing</text>
+</svg>
