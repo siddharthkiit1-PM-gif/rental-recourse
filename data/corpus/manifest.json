@@ -1,0 +1,74 @@
+{
+  "version": "v1",
+  "ingested_at": "2026-08-03T19:46:53.879Z",
+  "acts": {
+    "KARNATAKA_RENT_ACT_2001": {
+      "file": "karnataka-rent-act-2001.md",
+      "sections": [
+        "9",
+        "12",
+        "27",
+        "30",
+        "34"
+      ],
+      "source_url": "https://www.indiacode.nic.in/handle/123456789/7810",
+      "sha": "aeafe40206c5",
+      "has_placeholders": true
+    },
+    "MODEL_TENANCY_ACT_2021": {
+      "file": "model-tenancy-act-2021.md",
+      "sections": [
+        "11",
+        "12",
+        "21",
+        "32"
+      ],
+      "source_url": "https://mohua.gov.in/cms/model-tenancy-act.php",
+      "sha": "4690e1437f83",
+      "has_placeholders": true
+    },
+    "MAHARASHTRA_RENT_CONTROL_ACT_1999": {
+      "file": "maharashtra-rent-control-act-1999.md",
+      "sections": [
+        "7",
+        "24",
+        "33",
+        "55"
+      ],
+      "source_url": "https://www.indiacode.nic.in/handle/123456789/15817",
+      "sha": "e0ca149dd16b",
+      "has_placeholders": true
+    },
+    "CONSUMER_PROTECTION_ACT_2019": {
+      "file": "consumer-protection-act-2019.md",
+      "sections": [
+        "2(7)",
+        "2(11)",
+        "2(42)",
+        "35",
+        "38"
+      ],
+      "source_url": "https://www.indiacode.nic.in/handle/123456789/16103",
+      "sha": "278d2b4a50c0",
+      "has_placeholders": true
+    },
+    "INDIAN_CONTRACT_ACT_1872_SEC_74": {
+      "file": "indian-contract-act-1872-sec-74.md",
+      "sections": [
+        "74"
+      ],
+      "source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
+      "sha": "f78cf2f03937",
+      "has_placeholders": true
+    },
+    "CPC_1908_SEC_80": {
+      "file": "cpc-1908-sec-80.md",
+      "sections": [
+        "80"
+      ],
+      "source_url": "https://www.indiacode.nic.in/handle/123456789/2191",
+      "sha": "f3965c5071b0",
+      "has_placeholders": true
+    }
+  }
+}

@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "corpus:fetch": "tsx scripts/fetch-corpus.ts",
+    "corpus:ingest": "tsx scripts/ingest-corpus.ts",
+    "corpus:smoke": "tsx scripts/retrieval-smoke.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.103",
@@ -25,6 +28,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@google/genai": "^2.15.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
