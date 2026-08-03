@@ -1,0 +1,45 @@
+{
+  "name": "rental-recourse",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.103",
+    "@react-pdf/renderer": "^4.5.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.1",
+    "@upstash/vector": "^1.2.3",
+    "ai": "^6.0.240",
+    "next": "16.2.12",
+    "pdfjs-dist": "^6.2.108",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.7.0",
+    "dotenv": "^16.6.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "jsdom": "^25.0.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.4",
+    "typescript": "^5",
+    "vitest": "^2.1.9"
+  }
+}
