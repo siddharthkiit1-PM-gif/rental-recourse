@@ -80,21 +80,24 @@ export function AgentStream() {
   useEffect(() => {
     const stored = sessionStorage.getItem("recourse:intake");
     if (!stored) {
-      router.replace("/intake");
+      router.replace("/intake?reason=expired");
       return;
     }
     const intake = JSON.parse(stored);
     void sendMessage(
       { role: "user", parts: [{ type: "text", text: JSON.stringify(intake) }] },
       { body: intake },
-    );
+    ).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/429|rate/i.test(msg)) router.replace("/intake?reason=ratelimit");
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
       <span className="text-xl font-medium">Recourse</span>
       <h1 className="mt-10 text-3xl font-medium">Working on your notice…</h1>
-      <ul className="mt-10 space-y-8">
+      <ul className="mt-10 space-y-8" aria-live="polite">
         {steps.map((s) => (
           <li key={s.key} className="flex gap-4">
             <StatusDot status={s.status} />

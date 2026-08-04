@@ -13,26 +13,43 @@ const MAX_REGEN_ATTEMPTS = 3;
 
 type Writer = Pick<UIMessageStreamWriter, "write">;
 
+const OUT_OF_SCOPE_KEYWORDS = /\b(shop|office|commercial premises|godown|warehouse|storefront)\b/i;
+
 export async function runAgent(
   intake: IntakePayload,
   sessionId: string,
   writer: Writer,
 ): Promise<{ draft: DraftResult; corpus_version: string } | { error: string }> {
   try {
-    const classification = await classify(intake);
-    writer.write({ type: "data-classified", data: classification });
+    if (
+      intake.free_text_context &&
+      OUT_OF_SCOPE_KEYWORDS.test(intake.free_text_context)
+    ) {
+      writer.write({
+        type: "data-error",
+        data: {
+          step: "classify",
+          message:
+            "Commercial leases (shops, offices, godowns, warehouses) have a different legal framework. This tool covers residential tenancy only. Consult a professional.",
+        },
+      });
+      return { error: "commercial lease" };
+    }
 
     if (new Date(intake.tenancy_end) > new Date()) {
       writer.write({
         type: "data-error",
         data: {
-          step: "route",
+          step: "classify",
           message:
             "You appear to be a current tenant. This tool is for deposit recovery after vacation; mid-tenancy grievances are not yet supported.",
         },
       });
       return { error: "current tenant" };
     }
+
+    const classification = await classify(intake);
+    writer.write({ type: "data-classified", data: classification });
 
     const situationForRouting: Exclude<ClassificationResult["situation_type"], "ambiguous"> =
       classification.situation_type === "ambiguous" ? "non_return" : classification.situation_type;

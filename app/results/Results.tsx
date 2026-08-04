@@ -40,15 +40,15 @@ export function Results() {
       <header className="border-b border-[color:var(--color-hairline)] bg-white">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <span className="text-xl font-medium">Recourse</span>
-          <a
-            href={`/api/draft/download?id=${s.session_id}`}
+          <Link
+            href="/done?dl=1"
             className="px-4 py-2 rounded-md bg-[color:var(--color-ink)] text-white text-sm font-medium"
           >
             Download PDF
-          </a>
+          </Link>
         </div>
       </header>
-      <div className="max-w-6xl mx-auto px-6 py-8 grid md:grid-cols-[380px_1fr] gap-6">
+      <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col-reverse md:grid md:grid-cols-[380px_1fr] gap-6">
         <aside className="rounded-xl bg-white border border-[color:var(--color-hairline)] p-6 space-y-6">
           <Section
             label="YOUR SITUATION"

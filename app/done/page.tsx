@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { IntakeForm } from "./IntakeForm";
+import { Done } from "./Done";
 
-export default function IntakePage() {
+export default function DonePage() {
   return (
     <Suspense fallback={<main className="p-10">Loading…</main>}>
-      <IntakeForm />
+      <Done />
     </Suspense>
   );
 }

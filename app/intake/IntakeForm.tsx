@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IntakePayload } from "@/lib/agent/types";
 import { V1_STATES } from "@/lib/corpus/manifest";
 
@@ -22,6 +22,7 @@ type StepProps = {
 
 export function IntakeForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const [step, setStep] = useState(0);
   const [data, setData] = useState<FormState>({
     evidence_available: [],
@@ -29,7 +30,17 @@ export function IntakeForm() {
     free_text_context: null,
   });
   const [error, setError] = useState<string | null>(null);
+  const [banner, setBanner] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const reason = params.get("reason");
+    if (reason === "expired") setBanner("Your previous session expired. Start fresh below.");
+    if (reason === "ratelimit")
+      setBanner(
+        "You've hit the daily draft limit (10 per IP per 24 hours). Please come back tomorrow.",
+      );
+  }, [params]);
 
   const set: StepProps["set"] = (k, v) => setData((d) => ({ ...d, [k]: v }));
   const nextEnabled = validators[step](data);
@@ -55,6 +66,14 @@ export function IntakeForm() {
           Step {step + 1} of {STEPS.length}
         </span>
       </div>
+      {banner && (
+        <div
+          role="status"
+          className="mt-4 rounded-md bg-[color:var(--color-panel)] border border-[color:var(--color-hairline)] p-3 text-sm text-[color:var(--color-ink-muted)]"
+        >
+          {banner}
+        </div>
+      )}
       <div className="mt-4 flex gap-2" aria-label="Progress">
         {STEPS.map((_, i) => (
           <span
