@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.103",
+    "@ai-sdk/react": "^4.0.51",
     "@react-pdf/renderer": "^4.5.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.1",
