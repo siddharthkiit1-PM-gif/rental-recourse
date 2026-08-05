@@ -51,8 +51,8 @@ ${referenceBlock(chunks)}
 
 REQUIREMENTS:
 - Formal, non-inflammatory tone. No emotive or accusatory language.
-- Structure: header ("LEGAL NOTICE" and framing under Section 80 of the Code of Civil Procedure, 1908 where applicable), "From:", "To: [Landlord name and address]", "Date:", "Subject:", numbered paragraphs (1..N), demand paragraph with clear ask (return of deposit within 15 days), notice of intended further action if ignored, closing.
-- Include placeholders "[Your name]", "[Landlord name and address]", "[Your address]" — the user will fill these before sending.
+- Structure: header ("LEGAL NOTICE" and framing under Section 80 of the Code of Civil Procedure, 1908 where applicable), "From:" block with the tenant's real name and address from INTAKE, "To:" block with the landlord's real name and address from INTAKE, "Date: [Current Date]", "Subject:" line referencing the property address, numbered paragraphs (1..N), demand paragraph with clear ask (return of deposit within 15 days), notice of intended further action if ignored, closing with the tenant's real name.
+- Do NOT emit placeholder tokens like "[Your name]", "[Landlord name and address]", or "[Your address]". Use the values from INTAKE verbatim.
 - Every legal claim in the draft MUST cite one of the reference sections above by act name and section number.
 - Do not invent case law or judgments.
 - 400-1000 words.

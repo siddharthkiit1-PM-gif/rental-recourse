@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 export const IntakePayload = z.object({
+  tenant_name: z.string().min(2).max(200),
+  tenant_address: z.string().min(5).max(500),
+  landlord_name: z.string().min(2).max(200),
+  landlord_address: z.string().min(5).max(500),
+  property_address: z.string().min(5).max(500),
   state: z.string().min(2),
   city: z.string().min(2),
   monthly_rent_inr: z.number().positive().max(10_000_000),

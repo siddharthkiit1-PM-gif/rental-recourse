@@ -17,6 +17,11 @@ import { runAgent } from "@/lib/agent/orchestrator";
 import type { IntakePayload } from "@/lib/agent/types";
 
 const BASE: IntakePayload = {
+  tenant_name: "Ravi Kumar",
+  tenant_address: "12/3 MG Road, Bangalore 560001",
+  landlord_name: "S. Rao",
+  landlord_address: "7 Palm Grove, Indiranagar, Bangalore 560038",
+  property_address: "Flat 4B, Rose Villa, Koramangala 4th Block, Bangalore 560095",
   state: "Karnataka",
   city: "Bangalore",
   monthly_rent_inr: 35000,

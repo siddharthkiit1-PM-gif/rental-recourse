@@ -1,5 +1,6 @@
 "use client";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -46,6 +47,7 @@ export function AgentStream() {
   const [steps, setSteps] = useState<Step[]>(INITIAL_STEPS);
 
   const { sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/agent" }),
     onData: (part) => {
       const t = part.type as string;
       const data = (part.data ?? {}) as Record<string, unknown>;

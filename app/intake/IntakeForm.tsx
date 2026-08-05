@@ -8,6 +8,7 @@ type FormState = Partial<IntakePayload>;
 
 const STEPS = [
   "Where was the property?",
+  "Who are you and the landlord?",
   "Rent and deposit",
   "What happened?",
   "Timing",
@@ -91,11 +92,12 @@ export function IntakeForm() {
 
       <div className="mt-8">
         {step === 0 && <StepState data={data} set={set} />}
-        {step === 1 && <StepMoney data={data} set={set} />}
-        {step === 2 && <StepSituation data={data} set={set} />}
-        {step === 3 && <StepTiming data={data} set={set} />}
-        {step === 4 && <StepEvidence data={data} set={set} />}
-        {step === 5 && <StepFreeText data={data} set={set} />}
+        {step === 1 && <StepParties data={data} set={set} />}
+        {step === 2 && <StepMoney data={data} set={set} />}
+        {step === 3 && <StepSituation data={data} set={set} />}
+        {step === 4 && <StepTiming data={data} set={set} />}
+        {step === 5 && <StepEvidence data={data} set={set} />}
+        {step === 6 && <StepFreeText data={data} set={set} />}
       </div>
 
       {error && (
@@ -139,6 +141,14 @@ export function IntakeForm() {
 
 const validators: Array<(d: FormState) => boolean> = [
   (d) => Boolean(d.state && d.city),
+  (d) =>
+    Boolean(
+      d.tenant_name &&
+        d.tenant_address &&
+        d.landlord_name &&
+        d.landlord_address &&
+        d.property_address,
+    ),
   (d) =>
     Boolean(
       d.monthly_rent_inr && d.deposit_paid_inr && d.tenancy_start && d.tenancy_end,
@@ -191,7 +201,7 @@ function Select({
 }
 
 function StepState({ data, set }: StepProps) {
-  const options = [...V1_STATES, "Rajasthan", "Delhi", "Tamil Nadu", "Other"];
+  const options = [...new Set([...V1_STATES, "Rajasthan", "Delhi", "Other"])];
   return (
     <div className="space-y-6 max-w-md">
       <div>
@@ -220,6 +230,72 @@ function StepState({ data, set }: StepProps) {
       </div>
       <p className="text-xs text-[color:var(--color-ink-faint)]">
         We use this to pick the right state rent law.
+      </p>
+    </div>
+  );
+}
+
+function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const { className = "", ...rest } = props;
+  return (
+    <textarea
+      {...rest}
+      className={`w-full min-h-24 px-4 py-3 rounded-lg bg-white border border-[color:var(--color-hairline)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ink)] ${className}`}
+    />
+  );
+}
+
+function StepParties({ data, set }: StepProps) {
+  return (
+    <div className="space-y-6 max-w-xl">
+      <div>
+        <Label htmlFor="tn">Your full name</Label>
+        <Input
+          id="tn"
+          value={data.tenant_name ?? ""}
+          onChange={(e) => set("tenant_name", e.target.value)}
+          placeholder="e.g. Ravi Kumar"
+        />
+      </div>
+      <div>
+        <Label htmlFor="ta">Your current address</Label>
+        <TextArea
+          id="ta"
+          value={data.tenant_address ?? ""}
+          onChange={(e) => set("tenant_address", e.target.value)}
+          placeholder="Where the landlord should reply to you"
+        />
+      </div>
+      <div>
+        <Label htmlFor="ln">Landlord&apos;s full name</Label>
+        <Input
+          id="ln"
+          value={data.landlord_name ?? ""}
+          onChange={(e) => set("landlord_name", e.target.value)}
+          placeholder="Name on the rent agreement"
+        />
+      </div>
+      <div>
+        <Label htmlFor="la">Landlord&apos;s address</Label>
+        <TextArea
+          id="la"
+          value={data.landlord_address ?? ""}
+          onChange={(e) => set("landlord_address", e.target.value)}
+          placeholder="Where the notice will be posted"
+        />
+      </div>
+      <div>
+        <Label htmlFor="pa">Address of the rented property</Label>
+        <TextArea
+          id="pa"
+          value={data.property_address ?? ""}
+          onChange={(e) => set("property_address", e.target.value)}
+          placeholder="The property you vacated"
+        />
+      </div>
+      <p className="text-xs text-[color:var(--color-ink-faint)]">
+        These go into the notice header and the address block on the envelope. Stored
+        for 24 hours in your session, then automatically deleted.
       </p>
     </div>
   );
@@ -375,8 +451,7 @@ function StepFreeText({ data, set }: StepProps) {
   return (
     <div className="max-w-xl">
       <Label htmlFor="ft">
-        Add anything else in your own words (max 500 chars — do not include the
-        landlord&apos;s name/address here; only in the final downloaded draft)
+        Add anything else in your own words (max 500 chars)
       </Label>
       <textarea
         id="ft"
