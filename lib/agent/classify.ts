@@ -19,7 +19,7 @@ Evidence available: ${intake.evidence_available.join(", ") || "none"}
 Free text: ${intake.free_text_context ?? "(none)"}
 `;
   const { object } = await generateObject({
-    model: google("gemini-2.5-pro"),
+    model: google("gemini-2.5-flash"),
     schema: ClassificationResult,
     prompt,
     temperature: 0.2,

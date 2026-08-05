@@ -38,7 +38,14 @@ export async function POST(req: Request) {
       const result = await runAgent(intake, session_id, writer);
       if ("draft" in result) {
         const existing = await getSession(session_id);
-        if (existing) await saveSession({ ...existing, draft: result.draft });
+        if (existing)
+          await saveSession({
+            ...existing,
+            classification: result.classification,
+            forum: result.forum,
+            checklist: result.checklist,
+            draft: result.draft,
+          });
       }
     },
     onError: (e) => (e as Error).message,

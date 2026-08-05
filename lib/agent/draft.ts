@@ -68,7 +68,7 @@ WEAKNESS FLAGS: ${checklist.missing_weakness_flags.join("; ") || "none"}
 `;
 
   const { object } = await generateObject({
-    model: google("gemini-2.5-pro"),
+    model: google("gemini-2.5-flash"),
     schema: DraftSchema,
     prompt,
     temperature: 0.4,

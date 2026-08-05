@@ -7,7 +7,21 @@ import { draftNotice } from "./draft";
 import { verifyCitations } from "./verify";
 import { CORPUS_VERSION } from "@/lib/corpus/manifest";
 import { containsForbidden } from "@/lib/safety/forbidden";
-import type { IntakePayload, DraftResult, ClassificationResult } from "./types";
+import type {
+  IntakePayload,
+  DraftResult,
+  ClassificationResult,
+  ForumResult,
+  EvidenceChecklist,
+} from "./types";
+
+export type AgentSuccess = {
+  draft: DraftResult;
+  classification: ClassificationResult;
+  forum: ForumResult;
+  checklist: EvidenceChecklist;
+  corpus_version: string;
+};
 
 const MAX_REGEN_ATTEMPTS = 3;
 
@@ -19,7 +33,7 @@ export async function runAgent(
   intake: IntakePayload,
   sessionId: string,
   writer: Writer,
-): Promise<{ draft: DraftResult; corpus_version: string } | { error: string }> {
+): Promise<AgentSuccess | { error: string }> {
   try {
     if (
       intake.free_text_context &&
@@ -117,7 +131,13 @@ export async function runAgent(
     }
 
     writer.write({ type: "data-complete", data: { session_id: sessionId, draft: draft! } });
-    return { draft: draft!, corpus_version: CORPUS_VERSION };
+    return {
+      draft: draft!,
+      classification,
+      forum,
+      checklist,
+      corpus_version: CORPUS_VERSION,
+    };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     writer.write({ type: "data-error", data: { step: "orchestrator", message } });

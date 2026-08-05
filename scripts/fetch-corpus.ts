@@ -142,8 +142,6 @@ function extractFromPdfText(text: string, wanted: readonly string[]): Map<string
 }
 
 async function pdfToText(pdfBytes: Uint8Array): Promise<string> {
-  // Legacy build works in Node without a DOM.
-  // @ts-expect-error pdfjs-dist has no typings for legacy build path
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const doc = await pdfjs.getDocument({ data: pdfBytes, disableFontFace: true }).promise;
   let out = "";
@@ -152,7 +150,7 @@ async function pdfToText(pdfBytes: Uint8Array): Promise<string> {
     const content = await page.getTextContent();
     out +=
       content.items
-        .map((it: { str?: string }) => it.str ?? "")
+        .map((it) => ("str" in it ? it.str : ""))
         .join(" ") + "\n";
   }
   return out;
