@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { z } from "zod";
 import { IntakePayload } from "@/lib/agent/types";
 import { V1_STATES } from "@/lib/corpus/manifest";
 
@@ -51,7 +52,12 @@ export function IntakeForm() {
     setSubmitting(true);
     const parsed = IntakePayload.safeParse(data);
     if (!parsed.success) {
-      setError("Please check your answers — some fields are missing or invalid.");
+      const issue = parsed.error.issues[0];
+      const field = issue.path.join(".") || "form";
+      const label = FIELD_LABELS[field] ?? field;
+      setError(`${label}: ${issue.message}`);
+      const idx = FIELD_TO_STEP[field];
+      if (typeof idx === "number") setStep(idx);
       setSubmitting(false);
       return;
     }
@@ -139,25 +145,58 @@ export function IntakeForm() {
   );
 }
 
-const validators: Array<(d: FormState) => boolean> = [
-  (d) => Boolean(d.state && d.city),
-  (d) =>
-    Boolean(
-      d.tenant_name &&
-        d.tenant_address &&
-        d.landlord_name &&
-        d.landlord_address &&
-        d.property_address,
-    ),
-  (d) =>
-    Boolean(
-      d.monthly_rent_inr && d.deposit_paid_inr && d.tenancy_start && d.tenancy_end,
-    ),
-  (d) => Boolean(d.situation_type_user_selected),
-  (d) => typeof d.days_since_vacation === "number",
-  (d) => Array.isArray(d.evidence_available),
-  () => true,
+// Per-step validators reuse the zod schema so we never drift from it: each
+// step .pick()s its own fields and .safeParse()s the current form state.
+// A step passes iff all its declared fields are valid per the same rules as
+// final submit.
+const STEP_FIELDS: Array<Array<keyof IntakePayload>> = [
+  ["state", "city"],
+  ["tenant_name", "tenant_address", "landlord_name", "landlord_address", "property_address"],
+  ["monthly_rent_inr", "deposit_paid_inr", "tenancy_start", "tenancy_end"],
+  ["situation_type_user_selected"],
+  ["days_since_vacation"],
+  ["evidence_available"],
+  [],
 ];
+
+const validators: Array<(d: FormState) => boolean> = STEP_FIELDS.map((fields) => {
+  const shape = Object.fromEntries(
+    fields.map((f) => [f, (IntakePayload.shape as Record<string, z.ZodTypeAny>)[f]]),
+  );
+  const partial = z.object(shape);
+  return (d: FormState) => partial.safeParse(d).success;
+});
+
+// Which step to jump to when a given zod issue path points here.
+const FIELD_TO_STEP: Record<string, number> = Object.fromEntries(
+  STEP_FIELDS.flatMap((fields, i) => fields.map((f) => [f as string, i])),
+);
+
+function parseIntOrUndef(s: string): number | undefined {
+  const t = s.trim();
+  if (t === "") return undefined;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  state: "State",
+  city: "City",
+  tenant_name: "Your full name",
+  tenant_address: "Your current address",
+  landlord_name: "Landlord's full name",
+  landlord_address: "Landlord's address",
+  property_address: "Property address",
+  monthly_rent_inr: "Monthly rent",
+  deposit_paid_inr: "Deposit paid",
+  tenancy_start: "Tenancy start",
+  tenancy_end: "Tenancy end",
+  situation_type_user_selected: "Situation type",
+  days_since_vacation: "Days since you vacated",
+  last_communication_date: "Last communication date",
+  evidence_available: "Evidence",
+  free_text_context: "Free text",
+};
 
 function Label({
   children,
@@ -311,7 +350,7 @@ function StepMoney({ data, set }: StepProps) {
           type="number"
           min={1}
           value={data.monthly_rent_inr ?? ""}
-          onChange={(e) => set("monthly_rent_inr", Number(e.target.value))}
+          onChange={(e) => set("monthly_rent_inr", parseIntOrUndef(e.target.value) as number)}
         />
       </div>
       <div>
@@ -321,7 +360,7 @@ function StepMoney({ data, set }: StepProps) {
           type="number"
           min={1}
           value={data.deposit_paid_inr ?? ""}
-          onChange={(e) => set("deposit_paid_inr", Number(e.target.value))}
+          onChange={(e) => set("deposit_paid_inr", parseIntOrUndef(e.target.value) as number)}
         />
       </div>
       <div>
@@ -391,7 +430,7 @@ function StepTiming({ data, set }: StepProps) {
           type="number"
           min={0}
           value={data.days_since_vacation ?? ""}
-          onChange={(e) => set("days_since_vacation", Number(e.target.value))}
+          onChange={(e) => set("days_since_vacation", parseIntOrUndef(e.target.value) as number)}
         />
       </div>
       <div>
