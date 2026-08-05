@@ -33,7 +33,7 @@ async function embedQuery(text: string): Promise<number[]> {
   const res = await genai().models.embedContent({
     model: "gemini-embedding-001",
     contents: [{ role: "user", parts: [{ text }] }],
-    config: { outputDimensionality: 768, taskType: "RETRIEVAL_QUERY" },
+    config: { outputDimensionality: 1536, taskType: "RETRIEVAL_QUERY" },
   });
   const values = res.embeddings?.[0]?.values;
   if (!values) throw new Error("no embedding returned");

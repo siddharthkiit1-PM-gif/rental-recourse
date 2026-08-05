@@ -4,7 +4,7 @@ Free web tool for Indian tenants to draft a statute-grounded legal notice when a
 
 ## Stack
 
-Next.js 16 (App Router, Node runtime), TypeScript, Tailwind 4, Vercel AI SDK v6 + `@ai-sdk/google`, Gemini 2.5 Pro + `gemini-embedding-001` (768-dim), Upstash Vector + Redis + Ratelimit, `@react-pdf/renderer`, `vitest` + `@playwright/test`.
+Next.js 16 (App Router, Node runtime), TypeScript, Tailwind 4, Vercel AI SDK v6 + `@ai-sdk/google`, Gemini 2.5 Pro + `gemini-embedding-001` (1536-dim), Upstash Vector + Redis + Ratelimit, `@react-pdf/renderer`, `vitest` + `@playwright/test`.
 
 ## Local setup
 

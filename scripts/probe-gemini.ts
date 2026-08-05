@@ -10,7 +10,7 @@ async function main() {
   const res = await genai.models.embedContent({
     model: "gemini-embedding-001",
     contents: [{ role: "user", parts: [{ text: "hello world" }] }],
-    config: { outputDimensionality: 768, taskType: "RETRIEVAL_QUERY" },
+    config: { outputDimensionality: 1536, taskType: "RETRIEVAL_QUERY" },
   });
   const dim = res.embeddings?.[0]?.values?.length;
   console.log(`✓ embedding returned, dim=${dim}`);

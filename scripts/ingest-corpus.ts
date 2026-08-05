@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config({ path: ".env.local" });
+
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { GoogleGenAI } from "@google/genai";
@@ -50,10 +53,11 @@ async function embed(
   const res = await genai.models.embedContent({
     model: "gemini-embedding-001",
     contents: [{ role: "user", parts: [{ text }] }],
-    config: { outputDimensionality: 768, taskType },
+    config: { outputDimensionality: 1536, taskType },
   });
   const values = res.embeddings?.[0]?.values;
-  if (!values || values.length !== 768) throw new Error(`bad embedding len=${values?.length}`);
+  if (!values || values.length !== 1536)
+    throw new Error(`bad embedding len=${values?.length}`);
   return values;
 }
 
