@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { vectorIndex, namespaceFor } from "@/lib/vector/client";
+import { vectorIndex } from "@/lib/vector/client";
 import { CORPUS_VERSION } from "@/lib/corpus/manifest";
 
 let _genai: GoogleGenAI | null = null;
@@ -60,7 +60,7 @@ export async function retrieve({
     filter = `(${filter}) AND (${tagClause})`;
   }
   const res = await vectorIndex()
-    .namespace(namespaceFor(CORPUS_VERSION))
+    .namespace(CORPUS_VERSION)
     .query({ vector: vec, topK, includeMetadata: true, filter });
   return (res as Array<{ id: string; score: number; metadata: Record<string, unknown> }>).map(
     (r) => {

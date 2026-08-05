@@ -94,23 +94,3 @@ export const DraftResult = z.object({
   citations: z.array(Citation),
 });
 export type DraftResult = z.infer<typeof DraftResult>;
-
-export type AgentStepEvent =
-  | { type: "classified"; data: ClassificationResult }
-  | { type: "routed"; data: ForumResult }
-  | {
-      type: "retrieved";
-      data: { chunks: Array<{ act: string; section: string; score: number }> };
-    }
-  | { type: "checklist"; data: EvidenceChecklist }
-  | { type: "drafting"; data: { progress: "started" | "done" } }
-  | {
-      type: "verified";
-      data: {
-        verified: boolean;
-        unverified: Array<{ citation: { act: string; section: string }; reason: string }>;
-        corpus_version: string;
-      };
-    }
-  | { type: "complete"; data: { session_id: string; draft: DraftResult } }
-  | { type: "error"; data: { message: string; step: string } };

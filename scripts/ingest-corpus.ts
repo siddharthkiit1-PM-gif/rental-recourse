@@ -4,7 +4,7 @@ config({ path: ".env.local" });
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { GoogleGenAI } from "@google/genai";
-import { vectorIndex, namespaceFor } from "../lib/vector/client";
+import { vectorIndex } from "../lib/vector/client";
 import {
   ACTS,
   CORPUS_VERSION,
@@ -96,7 +96,7 @@ async function main() {
   }
   console.log(`Ingesting ${chunks.length} chunks to namespace "${CORPUS_VERSION}"...`);
   const index = vectorIndex();
-  const namespace = namespaceFor(CORPUS_VERSION);
+  const namespace = CORPUS_VERSION;
   const vectors: Array<{ id: string; vector: number[]; metadata: Record<string, unknown> }> = [];
   for (const c of chunks) {
     const vec = await embed(genai, c.text, "RETRIEVAL_DOCUMENT");

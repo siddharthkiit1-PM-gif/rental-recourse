@@ -10,7 +10,3 @@ export function vectorIndex(): Index {
   _index = new Index({ url, token });
   return _index;
 }
-
-export function namespaceFor(version: string): string {
-  return version;
-}
