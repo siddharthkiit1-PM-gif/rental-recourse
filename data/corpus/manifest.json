@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "ingested_at": "2026-08-03T19:46:53.879Z",
+  "ingested_at": "2026-08-05T01:27:25.029Z",
   "acts": {
     "KARNATAKA_RENT_ACT_2001": {
       "file": "karnataka-rent-act-2001.md",
@@ -11,9 +11,9 @@
         "30",
         "34"
       ],
-      "source_url": "https://www.indiacode.nic.in/handle/123456789/7810",
-      "sha": "aeafe40206c5",
-      "has_placeholders": true
+      "source_url": "https://prsindia.org/files/bills_acts/acts_states/karnataka/2001/2001KR34.pdf",
+      "sha": "ccf06fbde9b5",
+      "has_placeholders": false
     },
     "MODEL_TENANCY_ACT_2021": {
       "file": "model-tenancy-act-2021.md",
@@ -23,9 +23,14 @@
         "21",
         "32"
       ],
-      "source_url": "https://mohua.gov.in/cms/model-tenancy-act.php",
-      "sha": "4690e1437f83",
-      "has_placeholders": true
+      "source_url": "https://web.archive.org/web/2026/https://mohua.gov.in/upload/uploadfiles/files/Model-Tenancy-Act-English-02_06_2021.pdf",
+      "sha": "9af19cb8ac72",
+      "has_placeholders": true,
+      "missing_sections": [
+        "11",
+        "21",
+        "32"
+      ]
     },
     "MAHARASHTRA_RENT_CONTROL_ACT_1999": {
       "file": "maharashtra-rent-control-act-1999.md",
@@ -35,9 +40,9 @@
         "33",
         "55"
       ],
-      "source_url": "https://www.indiacode.nic.in/handle/123456789/15817",
-      "sha": "e0ca149dd16b",
-      "has_placeholders": true
+      "source_url": "https://indiankanoon.org/doc/183192021/",
+      "sha": "41f01003ed2f",
+      "has_placeholders": false
     },
     "CONSUMER_PROTECTION_ACT_2019": {
       "file": "consumer-protection-act-2019.md",
@@ -48,27 +53,27 @@
         "35",
         "38"
       ],
-      "source_url": "https://www.indiacode.nic.in/handle/123456789/16103",
-      "sha": "278d2b4a50c0",
-      "has_placeholders": true
+      "source_url": "https://indiankanoon.org/doc/48103131/",
+      "sha": "e6adfae53853",
+      "has_placeholders": false
     },
     "INDIAN_CONTRACT_ACT_1872_SEC_74": {
       "file": "indian-contract-act-1872-sec-74.md",
       "sections": [
         "74"
       ],
-      "source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
-      "sha": "f78cf2f03937",
-      "has_placeholders": true
+      "source_url": "https://indiankanoon.org/doc/171398/",
+      "sha": "123bab23c9be",
+      "has_placeholders": false
     },
     "CPC_1908_SEC_80": {
       "file": "cpc-1908-sec-80.md",
       "sections": [
         "80"
       ],
-      "source_url": "https://www.indiacode.nic.in/handle/123456789/2191",
-      "sha": "f3965c5071b0",
-      "has_placeholders": true
+      "source_url": "https://indiankanoon.org/doc/161831507/",
+      "sha": "858f9f9f55e8",
+      "has_placeholders": false
     }
   }
 }

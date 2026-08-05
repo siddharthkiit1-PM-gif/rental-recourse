@@ -63,12 +63,15 @@ async function main() {
   const genai = new GoogleGenAI({ apiKey });
 
   const chunks: Chunk[] = [];
+  const skipped: Array<{ act: string; section: string }> = [];
   for (const [actKey, act] of Object.entries(ACTS)) {
     const md = await readFile(path.join(CORPUS_DIR, act.file), "utf8");
     const sections = parseSections(md, act.sections);
     for (const [sec, body] of sections) {
-      if (body.includes("PLACEHOLDER"))
-        throw new Error(`corpus has placeholder in ${act.file} sec ${sec}`);
+      if (body.includes("PLACEHOLDER")) {
+        skipped.push({ act: act.name, section: sec });
+        continue;
+      }
       const id = `${actSlug(act.name)}__sec_${sec.replace(/[()]/g, "_")}__${CORPUS_VERSION}`;
       chunks.push({
         id,
@@ -98,6 +101,12 @@ async function main() {
   }
   await index.namespace(namespace).upsert(vectors);
   console.log(`Done. Upserted ${vectors.length} vectors to namespace ${namespace}.`);
+  if (skipped.length) {
+    console.warn(
+      `\nSkipped ${skipped.length} placeholder chunk(s) — paste verbatim text and re-ingest:`,
+    );
+    for (const s of skipped) console.warn(`  - ${s.act}, Section ${s.section}`);
+  }
 }
 
 main().catch((e) => {
