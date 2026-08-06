@@ -35,14 +35,14 @@ describe("routeForum matrix", () => {
     expect(r.limitation_flag).toBeTruthy();
   });
 
-  it("TC-C-05 Rajasthan → out_of_scope with limitation flag", () => {
+  it("TC-C-05 Bihar (out-of-scope state) → consumer_commission with limitation flag", () => {
     const r = routeForum({
       situation_type: "non_return",
       claim_value_inr: 95_000,
-      state: "Rajasthan",
-      city: "Jaipur",
+      state: "Bihar",
+      city: "Patna",
     });
-    expect(r.limitation_flag).toMatch(/Rajasthan/);
+    expect(r.limitation_flag).toMatch(/Bihar/);
     expect(r.primary_forum).toBe("consumer_commission");
   });
 
@@ -54,5 +54,62 @@ describe("routeForum matrix", () => {
       city: "Hyderabad",
     });
     expect(r.primary_forum).toBe("rent_authority");
+  });
+
+  it("TC-C-07 Delhi → rent_court under DRCA 1958", () => {
+    const r = routeForum({
+      situation_type: "non_return",
+      claim_value_inr: 95_000,
+      state: "Delhi",
+      city: "New Delhi",
+    });
+    expect(r.primary_forum).toBe("rent_court");
+    expect(r.jurisdiction).toMatch(/Delhi Rent Control Act, 1958/);
+    expect(r.limitation_flag).toBeNull();
+  });
+
+  it("TC-C-08 Tamil Nadu → rent_authority under TN 2017 Act", () => {
+    const r = routeForum({
+      situation_type: "non_return",
+      claim_value_inr: 95_000,
+      state: "Tamil Nadu",
+      city: "Chennai",
+    });
+    expect(r.primary_forum).toBe("rent_authority");
+    expect(r.jurisdiction).toMatch(/2017/);
+  });
+
+  it("TC-C-09 Telangana → rent_court under Telangana 1960 Act", () => {
+    const r = routeForum({
+      situation_type: "non_return",
+      claim_value_inr: 95_000,
+      state: "Telangana",
+      city: "Hyderabad",
+    });
+    expect(r.primary_forum).toBe("rent_court");
+    expect(r.jurisdiction).toMatch(/Telangana Buildings/);
+  });
+
+  it("TC-C-10 West Bengal → rent_court under WBPTA 1997", () => {
+    const r = routeForum({
+      situation_type: "non_return",
+      claim_value_inr: 95_000,
+      state: "West Bengal",
+      city: "Kolkata",
+    });
+    expect(r.primary_forum).toBe("rent_court");
+    expect(r.jurisdiction).toMatch(/West Bengal Premises Tenancy Act, 1997/);
+  });
+
+  it("TC-C-11 Rajasthan → rent_authority under Rajasthan RCA 2001", () => {
+    const r = routeForum({
+      situation_type: "non_return",
+      claim_value_inr: 95_000,
+      state: "Rajasthan",
+      city: "Jaipur",
+    });
+    expect(r.primary_forum).toBe("rent_authority");
+    expect(r.jurisdiction).toMatch(/Rajasthan Rent Control Act, 2001/);
+    expect(r.limitation_flag).toBeNull();
   });
 });

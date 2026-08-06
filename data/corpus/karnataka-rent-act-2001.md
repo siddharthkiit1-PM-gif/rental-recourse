@@ -1,7 +1,7 @@
 # Karnataka Rent Act, 2001
 
 > Source: https://prsindia.org/files/bills_acts/acts_states/karnataka/2001/2001KR34.pdf
-> Fetched: 2026-08-05T01:27:27.001Z
+> Fetched: 2026-08-06T19:39:52.783Z
 > State scope: Karnataka
 
 ## SECTION 9

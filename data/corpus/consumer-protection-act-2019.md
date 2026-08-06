@@ -1,7 +1,7 @@
 # Consumer Protection Act, 2019
 
 > Source: https://indiankanoon.org/doc/48103131/
-> Fetched: 2026-08-05T01:27:31.190Z
+> Fetched: 2026-08-06T19:39:58.690Z
 > State scope: *
 
 ## SECTION 2(7)

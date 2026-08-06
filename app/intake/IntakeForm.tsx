@@ -240,7 +240,7 @@ function Select({
 }
 
 function StepState({ data, set }: StepProps) {
-  const options = [...new Set([...V1_STATES, "Rajasthan", "Delhi", "Other"])];
+  const options = [...[...V1_STATES].sort(), "Other"];
   return (
     <div className="space-y-6 max-w-md">
       <div>

@@ -1,7 +1,7 @@
 # Maharashtra Rent Control Act, 1999
 
 > Source: https://indiankanoon.org/doc/183192021/
-> Fetched: 2026-08-05T01:27:31.082Z
+> Fetched: 2026-08-06T19:39:58.466Z
 > State scope: Maharashtra
 
 ## SECTION 7

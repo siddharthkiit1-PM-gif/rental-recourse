@@ -4,6 +4,48 @@ import type { ForumResult, ClassificationResult } from "./types";
 const CONSUMER_COMMISSION_LIMIT_INR = 50_00_000;
 const CIVIL_SUIT_HIGH_COURT_THRESHOLD_INR = 50_00_00_000;
 
+/**
+ * States with a dedicated modern rent-forum framework in v1 corpus.
+ * Each entry declares which primary forum applies and the jurisdiction
+ * string to render in the notice. Overrides the generic legal_notice
+ * → consumer_commission fallback.
+ */
+const DEDICATED_FORUMS: Record<
+  string,
+  {
+    primary_forum: ForumResult["primary_forum"];
+    forum_label: string;
+    act_cite: string;
+  }
+> = {
+  Delhi: {
+    primary_forum: "rent_court",
+    forum_label: "Court of the Rent Controller",
+    act_cite: "Delhi Rent Control Act, 1958 (s.50)",
+  },
+  "Tamil Nadu": {
+    primary_forum: "rent_authority",
+    forum_label: "Rent Authority",
+    act_cite:
+      "Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act, 2017 (ss.21, 30)",
+  },
+  Telangana: {
+    primary_forum: "rent_court",
+    forum_label: "Rent Controller",
+    act_cite: "Telangana Buildings (Lease, Rent and Eviction) Control Act, 1960 (s.15)",
+  },
+  "West Bengal": {
+    primary_forum: "rent_court",
+    forum_label: "Rent Controller",
+    act_cite: "West Bengal Premises Tenancy Act, 1997 (s.21)",
+  },
+  Rajasthan: {
+    primary_forum: "rent_authority",
+    forum_label: "Rent Authority (with appeal to Rent Tribunal)",
+    act_cite: "Rajasthan Rent Control Act, 2001 (ss.13, 22A)",
+  },
+};
+
 type RouteInput = {
   situation_type: Exclude<ClassificationResult["situation_type"], "ambiguous">;
   claim_value_inr: number;
@@ -15,6 +57,7 @@ export function routeForum(input: RouteInput): ForumResult {
   const { situation_type, claim_value_inr, state, city } = input;
   const isMTA = MTA_ADOPTED_STATES.has(state);
   const isV1 = V1_STATES.has(state);
+  const dedicated = DEDICATED_FORUMS[state];
   const limitationFlags: string[] = [];
 
   if (!isV1) {
@@ -52,11 +95,22 @@ export function routeForum(input: RouteInput): ForumResult {
     };
   }
 
+  if (dedicated) {
+    return {
+      primary_forum: dedicated.primary_forum,
+      secondary_forum: "consumer_commission",
+      jurisdiction: `${dedicated.forum_label}, ${city} — jurisdiction under the ${dedicated.act_cite}`,
+      filing_url: null,
+      reasoning: `${state} has a dedicated rent-dispute framework under the ${dedicated.act_cite}; that is the primary forum for this claim, with the District Consumer Commission available as a secondary route for deficiency-of-service claims under CPA 2019.`,
+      limitation_flag: null,
+    };
+  }
+
   if (isMTA) {
     return {
       primary_forum: "rent_authority",
       secondary_forum: "consumer_commission",
-      jurisdiction: `Rent Authority for ${city} (under state's Model Tenancy Act implementation)`,
+      jurisdiction: `Rent Authority for ${city} (under state's Model Tenancy Act, 2021 implementation)`,
       filing_url: null,
       reasoning: `${state} has adopted the Model Tenancy Act, 2021. The Rent Authority created under the Act is the primary forum for tenancy disputes.`,
       limitation_flag: null,

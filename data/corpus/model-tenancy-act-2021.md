@@ -1,7 +1,7 @@
 # Model Tenancy Act, 2021
 
 > Source: https://web.archive.org/web/2026/https://mohua.gov.in/upload/uploadfiles/files/Model-Tenancy-Act-English-02_06_2021.pdf
-> Fetched: 2026-08-05T01:27:30.941Z
+> Fetched: 2026-08-06T19:39:58.267Z
 > State scope: Andhra Pradesh, Tamil Nadu, Uttar Pradesh, Assam
 
 ## SECTION 11

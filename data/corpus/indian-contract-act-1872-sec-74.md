@@ -1,7 +1,7 @@
 # Indian Contract Act, 1872
 
 > Source: https://indiankanoon.org/doc/171398/
-> Fetched: 2026-08-05T01:27:31.309Z
+> Fetched: 2026-08-06T19:39:58.860Z
 > State scope: *
 
 ## SECTION 74

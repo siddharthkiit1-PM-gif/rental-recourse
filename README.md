@@ -1,6 +1,11 @@
 # Recourse
 
-Free web tool for Indian tenants to draft a statute-grounded legal notice when a landlord refuses to return a security deposit. v1 covers Karnataka, Maharashtra, and Model-Tenancy-Act-adopted states (Andhra Pradesh, Tamil Nadu, Uttar Pradesh, Assam).
+Free web tool for Indian tenants to draft a statute-grounded legal notice when a landlord refuses to return a security deposit.
+
+**v1 state coverage:**
+- **Full state-law grounding:** Karnataka (KRA 2001), Maharashtra (MRCA 1999), Delhi (DRCA 1958), Tamil Nadu (TNRRRLT 2017), Telangana (Buildings Act 1960), West Bengal (WBPTA 1997), Rajasthan (RCA 2001)
+- **MTA 2021 partial** (s.12 only): Andhra Pradesh, Uttar Pradesh, Assam
+- **Pan-India fallback** (Consumer Protection Act 2019 + Contract Act s.74 + CPC s.80) for any other state, with a limitation flag noted in the draft.
 
 ## Stack
 
@@ -29,14 +34,19 @@ Next.js 16 (App Router, Node runtime), TypeScript, Tailwind 4, Vercel AI SDK v6 
 
 `data/corpus/*.md` must contain **verbatim** Bare Act text under `## SECTION N` headers. The citation verifier compares the model's citations against these exact chunks — paraphrasing breaks grounding.
 
-For each of the six acts:
+For each of the eleven acts:
 
-- Karnataka Rent Act, 2001 (sections 9, 12, 27, 30, 34)
-- Model Tenancy Act, 2021 (sections 11, 12, 21, 32)
-- Maharashtra Rent Control Act, 1999 (sections 7, 24, 33, 55)
-- Consumer Protection Act, 2019 (sections 2(7), 2(11), 2(42), 35, 38)
-- Indian Contract Act, 1872 (section 74)
-- Code of Civil Procedure, 1908 (section 80)
+- Karnataka Rent Act, 2001 (ss.9, 12, 27, 30, 34)
+- Model Tenancy Act, 2021 (ss.11, 12, 21, 32)
+- Maharashtra Rent Control Act, 1999 (ss.7, 24, 33, 55)
+- Consumer Protection Act, 2019 (ss.2(7), 2(11), 2(42), 35, 38)
+- Indian Contract Act, 1872 (s.74)
+- Code of Civil Procedure, 1908 (s.80)
+- Delhi Rent Control Act, 1958 (ss.4, 6, 14, 27, 50)
+- Tamil Nadu R.R.R.L.T. Act, 2017 (ss.4, 6, 21, 30)
+- Telangana Buildings (LR&E) Control Act, 1960 (ss.4, 8, 9, 10, 15)
+- West Bengal Premises Tenancy Act, 1997 (ss.6, 7, 17, 21, 26)
+- Rajasthan Rent Control Act, 2001 (ss.9, 10, 13, 22)
 
 Open the `source_url` in `data/corpus/manifest.json`, copy each section from the official PDF, and replace the `[PLACEHOLDER …]` markers. Verify with:
 
