@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "ingested_at": "2026-08-06T19:39:50.767Z",
+  "ingested_at": "2026-08-06T21:46:53.968Z",
   "acts": {
     "KARNATAKA_RENT_ACT_2001": {
       "file": "karnataka-rent-act-2001.md",
@@ -12,7 +12,7 @@
         "34"
       ],
       "source_url": "https://prsindia.org/files/bills_acts/acts_states/karnataka/2001/2001KR34.pdf",
-      "sha": "7dbf8f58cc58",
+      "sha": "18cd9464bdac",
       "has_placeholders": false
     },
     "MODEL_TENANCY_ACT_2021": {
@@ -24,13 +24,8 @@
         "32"
       ],
       "source_url": "https://web.archive.org/web/2026/https://mohua.gov.in/upload/uploadfiles/files/Model-Tenancy-Act-English-02_06_2021.pdf",
-      "sha": "68a4e11c6639",
-      "has_placeholders": true,
-      "missing_sections": [
-        "11",
-        "21",
-        "32"
-      ]
+      "sha": "02f620dcb93c",
+      "has_placeholders": false
     },
     "MAHARASHTRA_RENT_CONTROL_ACT_1999": {
       "file": "maharashtra-rent-control-act-1999.md",
@@ -41,7 +36,7 @@
         "55"
       ],
       "source_url": "https://indiankanoon.org/doc/183192021/",
-      "sha": "6999fcc12664",
+      "sha": "329d5f72db84",
       "has_placeholders": false
     },
     "CONSUMER_PROTECTION_ACT_2019": {
@@ -54,7 +49,7 @@
         "38"
       ],
       "source_url": "https://indiankanoon.org/doc/48103131/",
-      "sha": "6e65db980c0e",
+      "sha": "ab6eccc037c9",
       "has_placeholders": false
     },
     "INDIAN_CONTRACT_ACT_1872_SEC_74": {
@@ -63,7 +58,7 @@
         "74"
       ],
       "source_url": "https://indiankanoon.org/doc/171398/",
-      "sha": "e4573cf4e19b",
+      "sha": "1c4e31c00a10",
       "has_placeholders": false
     },
     "CPC_1908_SEC_80": {
@@ -72,7 +67,7 @@
         "80"
       ],
       "source_url": "https://indiankanoon.org/doc/161831507/",
-      "sha": "6d155e2462d1",
+      "sha": "902716b6c2f4",
       "has_placeholders": false
     },
     "DELHI_RENT_CONTROL_ACT_1958": {
@@ -85,11 +80,8 @@
         "50"
       ],
       "source_url": "https://indiankanoon.org/doc/152548910/",
-      "sha": "973db0a00120",
-      "has_placeholders": true,
-      "missing_sections": [
-        "6"
-      ]
+      "sha": "49eb96fa4170",
+      "has_placeholders": false
     },
     "TAMIL_NADU_RRLT_ACT_2017": {
       "file": "tamil-nadu-rrlt-act-2017.md",
@@ -100,7 +92,7 @@
         "30"
       ],
       "source_url": "https://indiankanoon.org/doc/134441806/",
-      "sha": "54de1cb9adea",
+      "sha": "086499db4cf6",
       "has_placeholders": false
     },
     "TELANGANA_BUILDINGS_ACT_1960": {
@@ -113,11 +105,8 @@
         "15"
       ],
       "source_url": "https://www.indiacode.nic.in/bitstream/123456789/8607/1/act_15_of_1960.pdf",
-      "sha": "0917d1d1530c",
-      "has_placeholders": true,
-      "missing_sections": [
-        "4"
-      ]
+      "sha": "212787723087",
+      "has_placeholders": false
     },
     "WEST_BENGAL_PREMISES_TENANCY_ACT_1997": {
       "file": "west-bengal-premises-tenancy-act-1997.md",
@@ -129,7 +118,7 @@
         "26"
       ],
       "source_url": "https://indiankanoon.org/doc/140761342/",
-      "sha": "36f80047ad2a",
+      "sha": "a80cf2a06098",
       "has_placeholders": false
     },
     "RAJASTHAN_RENT_CONTROL_ACT_2001": {
@@ -141,7 +130,7 @@
         "22"
       ],
       "source_url": "https://indiankanoon.org/doc/18783076/",
-      "sha": "c6a9ebfbbae0",
+      "sha": "e8f40ff07a08",
       "has_placeholders": false
     }
   }

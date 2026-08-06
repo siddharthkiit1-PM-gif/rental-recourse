@@ -11,6 +11,8 @@
  */
 import { writeFile, mkdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { ACTS } from "../lib/corpus/manifest";
 
@@ -78,49 +80,66 @@ function stripHtml(inner: string): string {
  * `section_2` block, then narrow to `<section class="akn-subsection" id="section_2.7">`
  * or similar patterns IK uses.
  */
+/**
+ * IK marks every section as
+ *   <section class="akn-section" id="section_N">…</section>
+ * and every sub-clause as
+ *   <section class="akn-subsection" id="section_N.M">…</section>
+ * Both can be nested arbitrarily. A greedy `</section>` regex closes at
+ * the first inner tag and drops the body, so we slice by position: find
+ * the start marker for our target, then slice up to the next same-level
+ * marker (or EOF). Works for whole sections AND sub-clauses.
+ */
 function extractFromIndianKanoon(
   html: string,
   wanted: readonly string[],
 ): Map<string, string> {
   const out = new Map<string, string>();
-  const sectionRe = /<section class="akn-section" id="section_(\d+(?:\.\w+)?)"[^>]*>([\s\S]*?)<\/section>(?=\s*<section class="akn-(?:section|chapter|part)"|\s*<\/section>|\s*$)/g;
-  const all = new Map<string, string>();
-  for (const m of html.matchAll(sectionRe)) {
-    all.set(m[1], m[2]);
-  }
 
   for (const target of wanted) {
     const parenMatch = target.match(/^(\d+)\((\w+)\)$/);
     if (parenMatch) {
-      // IK uses nested <section id="section_N.M">…nested paragraphs…</section>.
-      // Regex can't handle proper nesting, so we anchor at the start id and
-      // slice to the next sibling: another section_N.<num> OR the next
-      // top-level section_(N+1). Search the whole HTML, not just the parent.
-      const startTag = `id="section_${parenMatch[1]}.${parenMatch[2]}"`;
+      const [, parent, sub] = parenMatch;
+      const startTag = `id="section_${parent}.${sub}"`;
       const start = html.indexOf(startTag);
       if (start < 0) continue;
       const after = html.slice(start + startTag.length);
-      // Match either the next sibling clause (section_N.<other>) or the next act section (section_M where M > N)
       const nextSibling = after.search(
-        new RegExp(`id="section_${parenMatch[1]}\\.(?!${parenMatch[2]}\\b)\\w+"|id="section_${Number(parenMatch[1]) + 1}[".]`),
+        new RegExp(
+          `id="section_${parent}\\.(?!${sub}\\b)\\w+"|id="section_${Number(parent) + 1}[".]`,
+        ),
       );
       const slice = nextSibling >= 0 ? after.slice(0, nextSibling) : after;
       const cleaned = stripHtml(slice);
       if (cleaned.length > 20) out.set(target, cleaned);
       continue;
     }
-    const raw = all.get(target);
-    if (raw) out.set(target, stripHtml(raw));
+
+    // Top-level section N: anchor on id="section_N" and slice to the next
+    // top-level section id (any pure integer), NOT any sub-clause of the
+    // current section (id="section_N.M").
+    const startTag = `id="section_${target}"`;
+    const start = html.indexOf(startTag);
+    if (start < 0) continue;
+    const after = html.slice(start + startTag.length);
+    // Next boundary: any id="section_<int>" that isn't a sub-clause of the current
+    const nextSection = after.search(/id="section_\d+"/);
+    const slice = nextSection >= 0 ? after.slice(0, nextSection) : after;
+    const cleaned = stripHtml(slice);
+    if (cleaned.length > 20) out.set(target, cleaned);
   }
 
   return out;
 }
 
 /**
- * Extract sections from a PDF's raw text. Bare Act PDFs typically contain
- * an "Arrangement of Sections" table (titles only) followed by the full body.
- * We collect every candidate for section N and keep the longest, which is
- * always the body — TOC entries are single-line titles.
+ * Extract sections from PDF text. Bare Act PDFs contain an 'Arrangement of
+ * Sections' TOC (titles only) at the front, then the full body. We collect
+ * every candidate for section N and keep the LONGEST — the body is always
+ * multi-clause and dwarfs the one-line TOC entry.
+ *
+ * Body-boundary regex: '<N>. ' followed by a capital, greedy until the next
+ * section number or CHAPTER/SCHEDULE header or EOF.
  */
 function extractFromPdfText(text: string, wanted: readonly string[]): Map<string, string> {
   const out = new Map<string, string>();
@@ -128,7 +147,7 @@ function extractFromPdfText(text: string, wanted: readonly string[]): Map<string
   for (const sec of wanted) {
     const escaped = sec.replace(/[()]/g, "\\$&");
     const re = new RegExp(
-      `\\b${escaped}\\.\\s+([A-Z][\\s\\S]*?)(?=\\s+\\d{1,3}\\.\\s+[A-Z]|\\s+CHAPTER\\s+[IVXLC]|\\s+SCHEDULE|$)`,
+      `\\b${escaped}\\.\\s+([A-Z\\(][\\s\\S]*?)(?=\\s+\\d{1,3}\\.\\s+[A-Z\\(]|\\s+CHAPTER\\s+[IVXLC]|\\s+SCHEDULE|\\s+FIRST\\s+SCHEDULE|$)`,
       "g",
     );
     let best = "";
@@ -141,19 +160,45 @@ function extractFromPdfText(text: string, wanted: readonly string[]): Map<string
   return out;
 }
 
+/**
+ * Extract text via poppler's `pdftotext -layout` with a right-margin crop
+ * (0.78 × page width). Most Indian Bare Act PDFs put section titles as
+ * marginalia in the right column; pdfjs interleaves them into body text,
+ * poisoning downstream section extraction. Cropping to the body column
+ * removes them cleanly. Falls back to pdfjs on any pdftotext failure so
+ * the script still works without poppler installed.
+ */
 async function pdfToText(pdfBytes: Uint8Array): Promise<string> {
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  const doc = await pdfjs.getDocument({ data: pdfBytes, disableFontFace: true }).promise;
-  let out = "";
-  for (let i = 1; i <= doc.numPages; i++) {
-    const page = await doc.getPage(i);
-    const content = await page.getTextContent();
-    out +=
-      content.items
-        .map((it) => ("str" in it ? it.str : ""))
-        .join(" ") + "\n";
+  const tmp = path.join(tmpdir(), `recourse-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
+  await writeFile(tmp, pdfBytes);
+  try {
+    const info = execFileSync("pdfinfo", [tmp], { encoding: "utf8" });
+    const size = info.match(/Page size:\s+([\d.]+)\s+x\s+([\d.]+)/);
+    if (!size) throw new Error("no page size");
+    // 0.795 of page width: crops the right-margin section-title column on
+    // MoHUA/indiacode PDFs. Validated empirically per PDF —
+    //   MTA A4  595pt → 473 (clean; 482+ bleeds "Se", "S", etc.)
+    //   Telangana 504pt → 400 (clean; 420+ bleeds "Det")
+    //   KRA Letter 612pt → 486 (no marginalia to worry about)
+    const w = Math.floor(Number(size[1]) * 0.795);
+    const h = Math.ceil(Number(size[2]));
+    return execFileSync(
+      "pdftotext",
+      ["-layout", "-x", "0", "-y", "0", "-W", String(w), "-H", String(h), tmp, "-"],
+      { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 },
+    );
+  } catch (err) {
+    console.warn(`  pdftotext failed (${(err as Error).message}); falling back to pdfjs`);
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const doc = await pdfjs.getDocument({ data: pdfBytes, disableFontFace: true }).promise;
+    let out = "";
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      out += content.items.map((it) => ("str" in it ? it.str : "")).join(" ") + "\n";
+    }
+    return out;
   }
-  return out;
 }
 
 type ActEntry = (typeof ACTS)[keyof typeof ACTS];
@@ -241,10 +286,12 @@ async function main() {
 
     const fetched = await fetchActSections(act);
 
-    // Any extraction shorter than 200 chars is almost certainly a title-only
-    // capture (arrangement-of-sections page, marginalia, etc.) — reject and
-    // let it fall through to the placeholder path so a human notices.
-    const MIN_BODY_LEN = 200;
+    // Any extraction shorter than 100 chars is almost certainly a title-only
+    // capture (arrangement-of-sections TOC line ~40-80 chars). Real bodies —
+    // even short single-sentence ones like MTA s.12 (~180 chars) — clear this
+    // floor. Reject and let it fall through to the placeholder path so a
+    // human notices.
+    const MIN_BODY_LEN = 100;
 
     const sections = new Map<string, string>();
     for (const s of act.sections) {

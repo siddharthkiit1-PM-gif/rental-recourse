@@ -3,9 +3,10 @@
 Free web tool for Indian tenants to draft a statute-grounded legal notice when a landlord refuses to return a security deposit.
 
 **v1 state coverage:**
-- **Full state-law grounding:** Karnataka (KRA 2001), Maharashtra (MRCA 1999), Delhi (DRCA 1958), Tamil Nadu (TNRRRLT 2017), Telangana (Buildings Act 1960), West Bengal (WBPTA 1997), Rajasthan (RCA 2001)
-- **MTA 2021 partial** (s.12 only): Andhra Pradesh, Uttar Pradesh, Assam
+- **Full state-law grounding:** Karnataka (KRA 2001), Maharashtra (MRCA 1999), Delhi (DRCA 1958), Tamil Nadu (TNRRRLT 2017), Telangana (Buildings Act 1960), West Bengal (WBPTA 1997), Rajasthan (RCA 2001), plus the Model Tenancy Act 2021 for Andhra Pradesh / Uttar Pradesh / Assam
 - **Pan-India fallback** (Consumer Protection Act 2019 + Contract Act s.74 + CPC s.80) for any other state, with a limitation flag noted in the draft.
+
+**Retrieval quality**: 43 verbatim Bare Act section chunks in the Upstash Vector index; 15/15 canned smoke queries hit the expected act + section on the top-5 retrieval.
 
 ## Stack
 
