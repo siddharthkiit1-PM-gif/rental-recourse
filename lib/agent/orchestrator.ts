@@ -79,7 +79,7 @@ export async function runAgent(
     const chunks = await retrieve({
       query: `${classification.situation_type} security deposit refund ${forum.primary_forum} ${intake.state}`,
       state: intake.state,
-      topK: 8,
+      topK: 5,
     });
     writer.write({
       type: "data-retrieved",
