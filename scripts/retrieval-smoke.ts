@@ -92,6 +92,43 @@ const CASES: Case[] = [
     must_include_act: "Consumer Protection Act, 2019",
     must_include_section: "38",
   },
+  {
+    name: "Delhi standard rent recovery",
+    state: "Delhi",
+    query: "landlord demanding rent above standard rent Delhi",
+    must_include_act: "Delhi Rent Control Act, 1958",
+    must_include_section: "4",
+  },
+  {
+    name: "TN tenancy registration",
+    state: "Tamil Nadu",
+    query: "tenancy agreement must be registered with rent authority Tamil Nadu",
+    must_include_act:
+      "Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act, 2017",
+    must_include_section: "4",
+  },
+  {
+    name: "Telangana deposit of rent with controller",
+    state: "Telangana",
+    query: "tenant deposit rent with Rent Controller landlord refuses to accept Telangana",
+    must_include_act:
+      "Telangana Buildings (Lease, Rent and Eviction) Control Act, 1960",
+    must_include_section: "9",
+  },
+  {
+    name: "WB rent controller deposit",
+    state: "West Bengal",
+    query: "deposit rent with Rent Controller when landlord refuses West Bengal",
+    must_include_act: "West Bengal Premises Tenancy Act, 1997",
+    must_include_section: "21",
+  },
+  {
+    name: "Rajasthan Rent Tribunal jurisdiction",
+    state: "Rajasthan",
+    query: "Rent Tribunal jurisdiction landlord tenant dispute Rajasthan",
+    must_include_act: "Rajasthan Rent Control Act, 2001",
+    must_include_section: "13",
+  },
 ];
 
 async function main() {
