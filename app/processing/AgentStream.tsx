@@ -1,7 +1,5 @@
 "use client";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type StepStatus = "pending" | "active" | "done" | "error";
@@ -45,55 +43,102 @@ function summarize(type: string, data: Record<string, unknown>): string {
 export function AgentStream() {
   const router = useRouter();
   const [steps, setSteps] = useState<Step[]>(INITIAL_STEPS);
-
-  const { sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/agent" }),
-    onData: (part) => {
-      const t = part.type as string;
-      const data = (part.data ?? {}) as Record<string, unknown>;
-      if (t === "data-session") return;
-      if (t === "data-complete") {
-        const sid = (data as { session_id: string }).session_id;
-        sessionStorage.setItem("recourse:session_id", sid);
-        setTimeout(() => router.push("/results"), 400);
-        return;
-      }
-      if (t === "data-error") {
-        const message = (data as { message: string }).message;
-        setSteps((prev) =>
-          prev.map((s) =>
-            s.status === "active" ? { ...s, status: "error", detail: message } : s,
-          ),
-        );
-        return;
-      }
-      setSteps((prev) => {
-        const next = [...prev];
-        const idx = next.findIndex((s) => `data-${s.key}` === t);
-        if (idx < 0) return prev;
-        next[idx] = { ...next[idx], status: "done", detail: summarize(t, data) };
-        const nn = next.findIndex((s) => s.status === "pending");
-        if (nn >= 0) next[nn] = { ...next[nn], status: "active" };
-        return next;
-      });
-    },
-  });
+  const [transportError, setTransportError] = useState<string | null>(null);
+  const started = useRef(false);
 
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+
     const stored = sessionStorage.getItem("recourse:intake");
     if (!stored) {
       router.replace("/intake?reason=expired");
       return;
     }
     const intake = JSON.parse(stored);
-    void sendMessage(
-      { role: "user", parts: [{ type: "text", text: JSON.stringify(intake) }] },
-      { body: intake },
-    ).catch((err: unknown) => {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (/429|rate/i.test(msg)) router.replace("/intake?reason=ratelimit");
+
+    (async () => {
+      let res: Response;
+      try {
+        res = await fetch("/api/agent", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(intake),
+        });
+      } catch {
+        setTransportError("Network error — check your connection.");
+        return;
+      }
+
+      if (res.status === 429) {
+        router.replace("/intake?reason=ratelimit");
+        return;
+      }
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        setTransportError(`Server returned ${res.status}. ${text.slice(0, 200)}`);
+        return;
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) {
+        setTransportError("No response stream.");
+        return;
+      }
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trim();
+          if (!payload || payload === "[DONE]") continue;
+          try {
+            const part = JSON.parse(payload) as { type: string; data?: unknown };
+            handleEvent(part);
+          } catch {
+            // ignore malformed SSE frames
+          }
+        }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleEvent(part: { type: string; data?: unknown }) {
+    const t = part.type;
+    const data = (part.data ?? {}) as Record<string, unknown>;
+    if (t === "data-session") return;
+    if (t === "data-complete") {
+      const sid = (data as { session_id: string }).session_id;
+      sessionStorage.setItem("recourse:session_id", sid);
+      setTimeout(() => router.push("/results"), 400);
+      return;
+    }
+    if (t === "data-error") {
+      const message = (data as { message: string }).message;
+      setSteps((prev) =>
+        prev.map((s) =>
+          s.status === "active" ? { ...s, status: "error", detail: message } : s,
+        ),
+      );
+      return;
+    }
+    setSteps((prev) => {
+      const next = [...prev];
+      const idx = next.findIndex((s) => `data-${s.key}` === t);
+      if (idx < 0) return prev;
+      next[idx] = { ...next[idx], status: "done", detail: summarize(t, data) };
+      const nn = next.findIndex((s) => s.status === "pending");
+      if (nn >= 0) next[nn] = { ...next[nn], status: "active" };
+      return next;
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
@@ -130,11 +175,11 @@ export function AgentStream() {
         ))}
       </ul>
       <p className="mt-16 text-sm text-[color:var(--color-ink-faint)]">
-        This usually takes 30–90 seconds.
+        This usually takes 20–40 seconds.
       </p>
-      {status === "error" && (
+      {transportError && (
         <p className="mt-4 text-sm text-red-700" role="alert">
-          Something took too long or failed.{" "}
+          {transportError}{" "}
           <button
             type="button"
             onClick={() => location.reload()}
