@@ -35,7 +35,10 @@ export const ACTS = {
     name: "Maharashtra Rent Control Act, 1999",
     aliases: ["Maharashtra Act No. XVIII of 2000"],
     file: "maharashtra-rent-control-act-1999.md",
-    sections: ["7", "24", "33", "55"],
+    // s.7 (Definitions) removed from v1 — it's a 9.8K-char definitions section
+    // that bloats the RAG prompt without being cited in deposit-recovery
+    // drafts. The substantive rules live in s.24, 33, 55.
+    sections: ["24", "33", "55"],
     state_scope: ["Maharashtra"],
     source_url: "https://indiankanoon.org/doc/183192021/",
     indiankanoon_doc_id: 183192021,
