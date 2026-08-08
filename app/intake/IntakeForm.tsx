@@ -4,6 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { IntakePayload } from "@/lib/agent/types";
 import { V1_STATES } from "@/lib/corpus/manifest";
+import {
+  DRAFT_RATELIMIT_PER_IP,
+  DRAFT_RATELIMIT_WINDOW,
+} from "@/lib/session/ratelimit";
 
 type FormState = Partial<IntakePayload>;
 
@@ -40,7 +44,7 @@ export function IntakeForm() {
     if (reason === "expired") setBanner("Your previous session expired. Start fresh below.");
     if (reason === "ratelimit")
       setBanner(
-        "You've hit the daily draft limit (10 per IP per 24 hours). Please come back tomorrow.",
+        `You've hit the daily draft limit (${DRAFT_RATELIMIT_PER_IP} per IP per ${DRAFT_RATELIMIT_WINDOW}). Please come back tomorrow.`,
       );
   }, [params]);
 

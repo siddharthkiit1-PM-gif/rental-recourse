@@ -1,6 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { verifyCitations } from "@/lib/agent/verify";
 import type { RetrievedChunk } from "@/lib/agent/retrieve";
+import { DraftResult } from "@/lib/agent/types";
+
+describe("DraftResult schema", () => {
+  it("rejects drafts shorter than 1500 chars (was 300 — too small)", () => {
+    const tooShort = "L".repeat(1499);
+    const r = DraftResult.safeParse({ draft_text: tooShort, citations: [] });
+    expect(r.success).toBe(false);
+  });
+
+  it("accepts drafts at or above 1500 chars", () => {
+    const ok = "L".repeat(1500);
+    const r = DraftResult.safeParse({ draft_text: ok, citations: [] });
+    expect(r.success).toBe(true);
+  });
+});
 
 const chunks: RetrievedChunk[] = [
   {
@@ -106,5 +121,50 @@ describe("verifyCitations", () => {
       user_state: "Karnataka",
     });
     expect(r.verified).toBe(false);
+  });
+
+  it("TC-G-08: catches 'Sec. N' surface form the old regex missed", () => {
+    const r = verifyCitations({
+      draft_text: "Under Sec. 47 of the Karnataka Rent Act, 2001 the tenant demands…",
+      citations: [], // section 47 is hallucinated, not declared
+      chunks,
+      user_state: "Karnataka",
+    });
+    expect(r.verified).toBe(false);
+  });
+
+  it("TC-G-09: catches 's. N' surface form", () => {
+    const r = verifyCitations({
+      draft_text: "As per s. 12 of the Karnataka Rent Act, 2001, refund is due.",
+      citations: [], // section 12 mentioned but not declared
+      chunks,
+      user_state: "Karnataka",
+    });
+    expect(r.verified).toBe(false);
+  });
+
+  it("TC-G-10: 'Section N' bare (no 'of the Act') still flagged if section not in any declared citation", () => {
+    const r = verifyCitations({
+      draft_text: "The tenant invokes Section 99 in this matter.",
+      citations: [
+        { act: "Karnataka Rent Act, 2001", section: "12", chunk_id: "karnataka_rent_act_2001__sec_12__v1" },
+      ],
+      chunks,
+      user_state: "Karnataka",
+    });
+    expect(r.verified).toBe(false);
+  });
+
+  it("TC-G-11: bare 'Section 12' passes when 12 is in a declared citation", () => {
+    const r = verifyCitations({
+      draft_text:
+        "The tenant invokes Section 12 (which is fully described in the reference block).",
+      citations: [
+        { act: "Karnataka Rent Act, 2001", section: "12", chunk_id: "karnataka_rent_act_2001__sec_12__v1" },
+      ],
+      chunks,
+      user_state: "Karnataka",
+    });
+    expect(r.verified).toBe(true);
   });
 });

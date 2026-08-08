@@ -6,7 +6,7 @@ import { evidenceChecklist } from "./checklist";
 import { draftNotice } from "./draft";
 import { verifyCitations } from "./verify";
 import { CORPUS_VERSION } from "@/lib/corpus/manifest";
-import { containsForbidden } from "@/lib/safety/forbidden";
+import { containsForbidden, sanitizeForbidden } from "@/lib/safety/forbidden";
 import type {
   IntakePayload,
   DraftResult,
@@ -115,7 +115,13 @@ export async function runAgent(
         },
       });
       if (v.verified && forbidden.length === 0) {
-        draft = candidate;
+        // Final sanitize: strip any leftover 'lawyer/attorney/counsel/legal
+        // advice' phrasing the model may have emitted even though the check
+        // passed (belt-and-braces — the check ran against raw output).
+        draft = {
+          ...candidate,
+          draft_text: sanitizeForbidden(candidate.draft_text),
+        };
         break;
       }
       if (attempt === MAX_REGEN_ATTEMPTS) {

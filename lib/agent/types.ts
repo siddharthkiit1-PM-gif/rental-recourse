@@ -90,7 +90,11 @@ export const Citation = z.object({
 export type Citation = z.infer<typeof Citation>;
 
 export const DraftResult = z.object({
-  draft_text: z.string().min(300).max(20_000),
+  // Legal notice needs a real body — From/To/Subject/Date block alone is
+  // ~200-300 chars, and the model was allowed to return that as a valid
+  // 'draft' under the old min(300). 1500 chars ≈ 300 words, roughly the
+  // shortest acceptable pre-litigation notice.
+  draft_text: z.string().min(1500).max(20_000),
   citations: z.array(Citation),
 });
 export type DraftResult = z.infer<typeof DraftResult>;
