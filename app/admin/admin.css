@@ -1,0 +1,12 @@
+/* Admin dashboard — dark warm ink aesthetic, editorial serif + mono */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+body:has(.recourse-ops) {
+  margin: 0;
+  background: #221e18;
+}
+
+.recourse-ops ::selection {
+  background: #e39a2b;
+  color: #1a1712;
+}
