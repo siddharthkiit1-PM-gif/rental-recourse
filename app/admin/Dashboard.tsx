@@ -25,9 +25,9 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
     router.refresh();
   }
 
-  const maxDrafts = Math.max(1, ...metrics.by_day.map((d) => d.drafts));
-  const completionPct = metrics.today.sessions
-    ? ((metrics.today.drafts / metrics.today.sessions) * 100).toFixed(1)
+  const maxAttempts = Math.max(1, ...metrics.by_day.map((d) => d.attempts));
+  const attemptsPerUser = metrics.today.unique_ips
+    ? (metrics.today.attempts / metrics.today.unique_ips).toFixed(1)
     : "—";
 
   return (
@@ -111,7 +111,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
               letterSpacing: "-0.02em",
             }}
           >
-            {metrics.total_drafts.toLocaleString("en-IN")}
+            {metrics.total_attempts.toLocaleString("en-IN")}
           </span>
           <div style={{ paddingBottom: 14 }}>
             <div
@@ -122,10 +122,10 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
                 textTransform: "uppercase",
               }}
             >
-              notices drafted · all-time
+              draft attempts · last {metrics.window_days} days
             </div>
             <div style={{ marginTop: 6, fontSize: 13, color: MUTED }}>
-              from {metrics.total_sessions.toLocaleString("en-IN")} sessions
+              from {metrics.total_unique_ips.toLocaleString("en-IN")} unique IPs
             </div>
           </div>
         </div>
@@ -140,24 +140,24 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
             borderTop: `1px solid ${HAIRLINE}`,
           }}
         >
-          <Stat label="drafts" value={metrics.today.drafts.toString()} />
-          <Stat label="sessions" value={metrics.today.sessions.toString()} />
-          <Stat label="completion" value={`${completionPct}%`} />
+          <Stat label="attempts" value={metrics.today.attempts.toString()} />
+          <Stat label="unique IPs" value={metrics.today.unique_ips.toString()} />
+          <Stat label="attempts / IP" value={attemptsPerUser} />
         </div>
       </section>
 
       <section style={{ marginBottom: 48 }}>
-        <SectionHeader>Successful drafts · by day (IST)</SectionHeader>
+        <SectionHeader>Draft attempts · by day (IST)</SectionHeader>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ color: MUTED, textAlign: "left" }}>
               <Th w="18%">Day</Th>
               <Th>Volume</Th>
-              <Th w="10%" alignRight>
-                Drafts
-              </Th>
               <Th w="12%" alignRight>
-                Sessions
+                Attempts
+              </Th>
+              <Th w="14%" alignRight>
+                Unique IPs
               </Th>
             </tr>
           </thead>
@@ -165,7 +165,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
             {metrics.by_day.length === 0 && (
               <tr>
                 <td colSpan={4} style={{ padding: 24, color: MUTED }}>
-                  No sessions in the last 24h window.
+                  No traffic in the last {metrics.window_days} days.
                 </td>
               </tr>
             )}
@@ -178,9 +178,9 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
                     style={{
                       display: "inline-block",
                       height: 10,
-                      width: `${(d.drafts / maxDrafts) * 100}%`,
+                      width: `${(d.attempts / maxAttempts) * 100}%`,
                       background: AMBER,
-                      opacity: d.drafts ? 1 : 0.2,
+                      opacity: d.attempts ? 1 : 0.2,
                     }}
                   />
                 </td>
@@ -192,7 +192,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
                     fontVariantNumeric: "tabular-nums",
                   }}
                 >
-                  {d.drafts}
+                  {d.attempts}
                 </td>
                 <td
                   style={{
@@ -202,7 +202,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
                     fontVariantNumeric: "tabular-nums",
                   }}
                 >
-                  {d.sessions}
+                  {d.unique_ips}
                 </td>
               </tr>
             ))}
@@ -222,7 +222,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
         }}
       >
         <span>
-          data · upstash redis · session ttl 24h · numbers reflect the rolling 24h window
+          data · upstash ratelimit analytics · {metrics.window_days}-day rolling · hourly buckets · attempts = /api/agent hits, not confirmed drafts
         </span>
         <span>
           fetched {new Date(metrics.fetched_at).toLocaleTimeString("en-IN")} · auto-refresh 30s

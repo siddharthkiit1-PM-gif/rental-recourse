@@ -1,7 +1,7 @@
-import { redis } from "@/lib/session/redis";
-import type { Session } from "@/lib/session/redis";
+import { draftRatelimit } from "@/lib/session/ratelimit";
 
 const IST_OFFSET_MIN = 5 * 60 + 30;
+const HOURS_IN_WINDOW = 24 * 7;
 
 function toISTDay(msUtc: number): string {
   const d = new Date(msUtc + IST_OFFSET_MIN * 60_000);
@@ -16,67 +16,81 @@ export function todayIST(): string {
 }
 
 export type DailyRow = {
-  day: string; // YYYY-MM-DD (IST)
-  drafts: number;
-  sessions: number;
+  day: string;
+  attempts: number;
+  unique_ips: number;
 };
 
 export type Metrics = {
   fetched_at: number;
-  total_sessions: number;
-  total_drafts: number;
+  window_days: number;
   today: DailyRow;
-  by_day: DailyRow[]; // sorted desc by day
+  by_day: DailyRow[];
+  total_attempts: number;
+  total_unique_ips: number;
 };
 
-export async function loadMetrics(): Promise<Metrics> {
-  const r = redis();
-  const keys: string[] = [];
-  // Upstash Redis SCAN: cursor is a string; "0" means done. Safer than KEYS at
-  // scale; small footprint today (~500 keys) but futureproof.
-  let cursor: string | number = 0;
-  while (true) {
-    const res: [string | number, string[]] = await r.scan(cursor, {
-      match: "recourse:session:*",
-      count: 500,
-    });
-    keys.push(...res[1]);
-    cursor = res[0];
-    if (String(cursor) === "0") break;
-  }
+export type HourlyBucket = {
+  time: number;
+  identifier?: Record<string, number>;
+};
 
-  const perDay = new Map<string, DailyRow>();
-  let totalDrafts = 0;
+// Pure aggregator — exported so it can be unit-tested without hitting Upstash.
+export function aggregateByDay(
+  buckets: HourlyBucket[],
+  today: string,
+): Omit<Metrics, "fetched_at" | "window_days"> {
+  const perDay = new Map<string, { attempts: number; ips: Set<string> }>();
+  const allIps = new Set<string>();
+  let totalAttempts = 0;
 
-  // Read in chunks of 100 via mget-friendly pipelining
-  for (let i = 0; i < keys.length; i += 100) {
-    const chunk = keys.slice(i, i + 100);
-    const vals = (await r.mget(...chunk)) as Array<Session | string | null>;
-    for (const v of vals) {
-      if (!v) continue;
-      const s = typeof v === "string" ? (JSON.parse(v) as Session) : v;
-      const day = toISTDay(s.created_at ?? Date.now());
-      const row = perDay.get(day) ?? { day, drafts: 0, sessions: 0 };
-      row.sessions += 1;
-      if (s.draft) {
-        row.drafts += 1;
-        totalDrafts += 1;
-      }
-      perDay.set(day, row);
+  for (const b of buckets) {
+    if (!b.identifier) continue;
+    const day = toISTDay(b.time);
+    const row = perDay.get(day) ?? { attempts: 0, ips: new Set<string>() };
+    for (const [ip, n] of Object.entries(b.identifier)) {
+      row.attempts += n;
+      row.ips.add(ip);
+      allIps.add(ip);
+      totalAttempts += n;
     }
+    perDay.set(day, row);
   }
 
-  const today = todayIST();
-  const byDay = [...perDay.values()].sort((a, b) => (a.day < b.day ? 1 : -1));
+  const byDay: DailyRow[] = [...perDay.entries()]
+    .map(([day, v]) => ({ day, attempts: v.attempts, unique_ips: v.ips.size }))
+    .sort((a, b) => (a.day < b.day ? 1 : -1));
+
   const todayRow: DailyRow =
-    perDay.get(today) ?? { day: today, drafts: 0, sessions: 0 };
+    byDay.find((r) => r.day === today) ?? { day: today, attempts: 0, unique_ips: 0 };
 
   return {
-    fetched_at: Date.now(),
-    total_sessions: keys.length,
-    total_drafts: totalDrafts,
     today: todayRow,
     by_day: byDay,
+    total_attempts: totalAttempts,
+    total_unique_ips: allIps.size,
+  };
+}
+
+export async function loadMetrics(): Promise<Metrics> {
+  const rl = draftRatelimit();
+  const analytics = (rl as unknown as { analytics?: { getUsageOverTime: (n: number, k: string) => Promise<HourlyBucket[]> } }).analytics;
+  if (!analytics) {
+    return {
+      fetched_at: Date.now(),
+      window_days: 7,
+      today: { day: todayIST(), attempts: 0, unique_ips: 0 },
+      by_day: [],
+      total_attempts: 0,
+      total_unique_ips: 0,
+    };
+  }
+  const buckets = await analytics.getUsageOverTime(HOURS_IN_WINDOW, "identifier");
+  const agg = aggregateByDay(buckets, todayIST());
+  return {
+    fetched_at: Date.now(),
+    window_days: 7,
+    ...agg,
   };
 }
 
