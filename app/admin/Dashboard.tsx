@@ -41,7 +41,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
     router.refresh();
   }
 
-  const { totals, prior, today, by_day, window_days } = metrics;
+  const { totals, prior, today, by_day, window_days, counters_start_day } = metrics;
   const maxAttempts = Math.max(1, ...by_day.map((d) => d.attempts));
   const delta = fmtDeltaPct(prior?.attempts_delta_pct ?? null);
 
@@ -173,6 +173,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
               </tr>
             )}
             {by_day.map((d) => {
+              const countersLive = d.day >= counters_start_day;
               return (
                 <tr key={d.day} style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
                   <td style={{ padding: "12px 0", color: CREAM }}>{d.day}</td>
@@ -189,10 +190,10 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
                     />
                   </td>
                   <Td right cream>{fmtN(d.attempts)}</Td>
-                  <Td right cream={d.completions > 0}>{d.completions > 0 ? fmtN(d.completions) : "—"}</Td>
-                  <Td right cream={d.completions > 0}>{d.completions > 0 ? fmtPct(d.completion_rate) : "—"}</Td>
+                  <Td right cream={countersLive}>{countersLive ? fmtN(d.completions) : "—"}</Td>
+                  <Td right cream={countersLive}>{countersLive ? fmtPct(d.completion_rate) : "—"}</Td>
                   <Td right cream>{fmtN(d.unique_ips)}</Td>
-                  <Td right cream={d.rating_5 > 0}>{d.ratings_total > 0 ? fmtN(d.rating_5) : "—"}</Td>
+                  <Td right cream={countersLive}>{countersLive ? fmtN(d.rating_5) : "—"}</Td>
                 </tr>
               );
             })}
@@ -219,7 +220,7 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
         <span>
           caveats · attempts = /api/agent hits, may include user retries ·
           DAU = unique IPs (multi-user households register as 1) ·
-          completions/ratings/5★ counters started 2026-08-16, earlier days show "—"
+          completions/ratings/5★ counters started {counters_start_day}, earlier days show "—"
         </span>
         <span>
           fetched {new Date(metrics.fetched_at).toLocaleTimeString("en-IN")} · auto-refresh 30s

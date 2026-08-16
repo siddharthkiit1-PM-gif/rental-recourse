@@ -6,6 +6,10 @@ const WINDOW_DAYS = 7;
 const HOURS_IN_WINDOW = 24 * WINDOW_DAYS;
 const HOURS_IN_TWO_WEEKS = HOURS_IN_WINDOW * 2;
 
+// The first IST day durable counters (completions / ratings / 5★) were live.
+// Rows before this show "—" in the UI to distinguish "unknown" from "genuinely zero".
+export const COUNTERS_START_DAY = "2026-08-16";
+
 function toISTDay(msUtc: number): string {
   const d = new Date(msUtc + IST_OFFSET_MIN * 60_000);
   const yyyy = d.getUTCFullYear();
@@ -47,6 +51,7 @@ export type WoW = {
 export type Metrics = {
   fetched_at: number;
   window_days: number;
+  counters_start_day: string;
   today: DailyRow;
   by_day: DailyRow[]; // desc by day
   totals: Totals;
@@ -156,7 +161,14 @@ export function buildMetrics(args: {
     };
   }
 
-  return { window_days: WINDOW_DAYS, today: todayRow, by_day: byDay, totals, prior };
+  return {
+    window_days: WINDOW_DAYS,
+    counters_start_day: COUNTERS_START_DAY,
+    today: todayRow,
+    by_day: byDay,
+    totals,
+    prior,
+  };
 }
 
 function sumMap(m: Map<string, number>): number {

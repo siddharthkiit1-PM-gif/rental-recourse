@@ -62,6 +62,7 @@ describe("buildMetrics", () => {
   it("empty everything → today row zeroed, by_day contains only today", () => {
     const r = call();
     expect(r.window_days).toBe(7);
+    expect(r.counters_start_day).toBe("2026-08-16");
     expect(r.today).toEqual({
       day: "2026-08-16",
       attempts: 0,
