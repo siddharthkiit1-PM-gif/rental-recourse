@@ -8,7 +8,7 @@
 
 **What:** An AI legal assistant for Indian tenants. Enter your rental situation → get a filing-ready legal notice or forum recommendation, grounded in verbatim state-law citations, in ~30 seconds. Free.
 
-**Who:** Indian renters with security-deposit disputes, non-refunds, illegal eviction threats, or landlord-communication breakdowns. Multi-jurisdictional (6 state acts + CPC + Consumer Protection Act).
+**Who:** Indian renters with security-deposit disputes, non-refunds, illegal eviction threats, or landlord-communication breakdowns. Multi-jurisdictional — covers 10 state jurisdictions (7 with dedicated state Rent Acts, 3 more via the Model Tenancy Act) plus the Consumer Protection Act, Indian Contract Act, and CPC §80.
 
 **Where:** [rental-recourse.vercel.app](https://rental-recourse.vercel.app). Solo-built. Launched 2026-08-10.
 
@@ -28,8 +28,11 @@
 5. **Edit + Download** — inline edit, PDF export, rate 1–5★
 
 ### Coverage today
-- **State rent acts (6):** Karnataka, Delhi, Tamil Nadu, Telangana, West Bengal, Rajasthan
-- **National statutes:** Code of Civil Procedure (§80 notice), Consumer Protection Act 2019
+- **State jurisdictions (10)** — pulled from `V1_STATES` in `lib/corpus/manifest.ts`:
+  - **Dedicated state Rent Acts (7):** Karnataka, Maharashtra, Delhi, Tamil Nadu, Telangana, West Bengal, Rajasthan — verbatim bare-act text in the corpus.
+  - **Covered via Model Tenancy Act 2021 (3 more):** Andhra Pradesh, Uttar Pradesh, Assam (states that have formally adopted MTA).
+- **National statutes:** Model Tenancy Act 2021, Consumer Protection Act 2019, Indian Contract Act 1872, Code of Civil Procedure (§80 notice).
+- **"Other" state fallback:** landing page routes users from any other state to intake with a fallback note — drafting uses Consumer Protection Act + Contract Act + CPC §80, which apply nationwide for deposit disputes.
 - **Situation types:** non_return, landlord_unreachable, illegal_eviction_threat, harassment, forced_lockout, others
 - **Forum routing:** deterministic rule matrix (`lib/agent/route.ts`) — no LLM in this decision path
 - **Fidelity:** verbatim bare-act text in the corpus, citation verifier rejects hallucinated section numbers
