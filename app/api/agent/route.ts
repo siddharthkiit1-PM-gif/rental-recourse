@@ -4,6 +4,7 @@ import { IntakePayload } from "@/lib/agent/types";
 import { newSessionId } from "@/lib/util/ids";
 import { getSession, saveSession } from "@/lib/session/redis";
 import { draftRatelimit } from "@/lib/session/ratelimit";
+import { incrDailyQuiet } from "@/lib/admin/counters";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
             checklist: result.checklist,
             draft: result.draft,
           });
+        await incrDailyQuiet("draft_completed");
       }
     },
     onError: (e) => (e as Error).message,
