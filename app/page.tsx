@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { V1_STATES } from "@/lib/corpus/manifest";
+
+const STATE_CHIPS = [...V1_STATES].sort();
 
 export default function LandingPage() {
   return (
@@ -9,16 +12,39 @@ export default function LandingPage() {
           Landlord not returning your deposit?
         </h1>
         <p className="mt-6 text-lg text-[color:var(--color-ink-muted)] max-w-2xl">
-          Free tool that drafts a legal notice grounded in the Karnataka Rent Act, Model
-          Tenancy Act, and Consumer Protection Act. Takes ~5 minutes.
+          Free tool that drafts a filing-ready legal notice, grounded in your state&apos;s
+          rent law and Indian national statutes. Takes ~5 minutes.
         </p>
-        <Link
-          href="/intake"
-          className="inline-flex mt-10 items-center px-6 py-4 rounded-lg bg-[color:var(--color-ink)] text-white text-base font-medium hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ink)]"
-        >
-          Get my notice drafted →
-        </Link>
-        <p className="mt-4 text-sm text-[color:var(--color-ink-faint)]">
+
+        <div className="mt-10">
+          <p className="text-sm font-medium tracking-wide text-[color:var(--color-ink)] uppercase">
+            Select your state to begin
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {STATE_CHIPS.map((state) => (
+              <Link
+                key={state}
+                href={`/intake?state=${encodeURIComponent(state)}`}
+                className="inline-flex items-center px-4 py-2.5 rounded-lg border border-[color:var(--color-ink)] bg-[color:var(--color-ink)] text-white text-sm font-medium hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ink)]"
+              >
+                {state}
+              </Link>
+            ))}
+            <Link
+              href="/intake?state=Other"
+              className="inline-flex items-center px-4 py-2.5 rounded-lg border border-[color:var(--color-hairline)] bg-transparent text-[color:var(--color-ink)] text-sm font-medium hover:bg-[color:var(--color-panel)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-ink)]"
+            >
+              Other state →
+            </Link>
+          </div>
+          <p className="mt-3 text-sm text-[color:var(--color-ink-faint)]">
+            Not on the list? Pick <strong>Other state</strong> — we&apos;ll draft using the
+            Consumer Protection Act, Indian Contract Act, and CPC §80, which apply anywhere
+            in India for deposit disputes.
+          </p>
+        </div>
+
+        <p className="mt-8 text-sm text-[color:var(--color-ink-faint)]">
           No signup. No payment. Session only.
         </p>
 

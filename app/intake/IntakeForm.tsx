@@ -46,6 +46,10 @@ export function IntakeForm() {
       setBanner(
         `You've hit the daily draft limit (${DRAFT_RATELIMIT_PER_IP} per IP per ${DRAFT_RATELIMIT_WINDOW}). Please come back tomorrow.`,
       );
+    const state = params.get("state");
+    if (state && (V1_STATES.has(state) || state === "Other")) {
+      setData((d) => (d.state ? d : { ...d, state }));
+    }
   }, [params]);
 
   const set: StepProps["set"] = (k, v) => setData((d) => ({ ...d, [k]: v }));
