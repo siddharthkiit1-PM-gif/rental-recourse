@@ -1,6 +1,19 @@
-# Tenant Feedback Questionnaire — Recourse
+# Tenant Feedback Questionnaire — Recourse (Tally)
 
-> **How to use this file:** Paste this entire document into Gemini (or ChatGPT) with the prompt: *"Convert this markdown into a Google Form. Preserve every question type, all options, the required flags, section breaks, and the branching logic noted under each question. Set the form to show a progress bar, shuffle nothing, and go to a section based on answer for the branching questions. Title the form: 'Recourse — how do we build for tenants?' Set the confirmation message to: 'Thanks. We read every response, and if you left your email we'll follow up personally.'"*
+> **How to use this file (Tally):**
+>
+> **Option 1 — Tally AI form builder:** In Tally, click "Create form" → "AI form generator" (or the "Generate with AI" button). Paste this entire document with the prompt:
+>
+> *"Build this exact form. Preserve every question type, every option, the required flags, and the section breaks as separate pages. For Q8, add a logic rule: if the answer is 'Yes — I completed a draft' OR 'Yes — I started but didn't complete', continue to Q9; otherwise, jump to Section 4. For Q14, use a native Ranking block instead of checkboxes (drag-to-rank, all options ranked). Title the form 'Recourse — how do we build for tenants?' Set the thank-you screen to: 'Thanks. We read every response, and if you left your email we'll follow up personally.'"*
+>
+> **Option 2 — Manual build:** Create a new form → add a page-break block between each section below → copy questions in order. Tally block mapping:
+> - Multiple choice → **Multiple Choice**
+> - Checkboxes → **Checkboxes**
+> - Short answer → **Short Answer**
+> - Long answer → **Long Answer**
+> - Linear scale → **Linear Scale**
+> - Q14 ranking → **Ranking** (native, drag-to-rank)
+> - Q8 branching → use the **Logic** menu on Q8
 
 ---
 
@@ -8,18 +21,21 @@
 
 - **Distribution:** LinkedIn viral post (~400K impressions, 3.6K reactions, 170 comments, 90 reposts). Audience is mostly Indian urban professionals, 25–40, mix of tenants + PMs + a few lawyers.
 - **Goal:** in ONE 3–5 min survey, capture (a) segment (renter today vs recently vs never), (b) real pain points across the rental lifecycle, (c) direct feedback on Recourse from those who tried it, (d) category-discovery signal for what to build next, (e) willingness-to-pay across pricing tiers, (f) willingness to share sensitive artefacts (agreement, video, consult), (g) aha-moment articulation, (h) interview opt-in.
-- **Design decisions:** branching keeps non-Recourse-users from being asked product-specific questions (they'd guess). Top-3 checkbox is used instead of rank-order because Google Forms doesn't support drag-ranking natively. Every "willingness to pay" question offers a "free-only" option to avoid biasing upward.
+- **Design decisions:** branching keeps non-Recourse-users from being asked product-specific questions (they'd guess). Q14 uses Tally's native Ranking block (drag to reorder) — better signal than a top-3 checkbox because we get the full priority ordering, not just membership. Every "willingness to pay" question offers a "free-only" option to avoid biasing upward.
 - **Comment-informed additions:** questions about the stuck-report bug (surfaced by two commenters), the landlord-reputation ("Glassdoor for landlords") feature request, escrow interest, and language coverage — all traced back to what actual readers asked for.
 
 ---
 
-## Form settings (Gemini: apply these)
+## Form settings (Tally: apply these)
 
-- Progress bar: **on**
-- One section per page: **on**
-- Response collection: **email addresses NOT auto-collected** (we ask optionally at the end so people who want to stay anonymous can)
-- Allow response editing: **on**
-- Send to Google Sheets: **on** (for analysis)
+- **Layout:** page-by-page (one question or one section per page). Tally's "Page break" block enforces this.
+- **Progress indicator:** on (Tally: form Settings → "Show progress bar").
+- **Response notifications:** on for your admin email (Tally: Integrations → Email → notify on submit).
+- **Collect email:** off at form level. We ask for email optionally in Section 7 so respondents can stay anonymous.
+- **Redirect / Thank-you:** custom thank-you screen (text above); no external redirect.
+- **Google Sheets sync:** on (Tally: Integrations → Google Sheets). Fresh sheet for cleaner analysis.
+- **Response cap:** none.
+- **Public URL:** enable public sharing so you can drop the link into a LinkedIn comment / repost / DM.
 
 ---
 
@@ -141,8 +157,8 @@
 - Escrow / neutral holding of deposit at move-in
 - None of the above yet
 
-### Q14 [Checkboxes, required, limit 3]
-**If Recourse could add ONE more thing this quarter, which top 3 would you actually use? (Max 3.)**
+### Q14 [Ranking, required]
+**If Recourse could add these things next, drag them into your order of importance (top = most wanted).**
 - Rental agreement drafter with tenant-fair defaults
 - Rental agreement analyzer (upload existing, we flag red clauses)
 - Video / chat consult with a verified legal advisor on the platform
@@ -237,7 +253,7 @@ When results come in, look for these signals in order of priority:
 2. **Pain concentration.** Q4 top-3 aggregated — the top 3 pains should map to your 90-day roadmap. Anything below rank 4 is not next quarter's problem.
 3. **Current-product friction.** Q10 checkboxes — sort by frequency. If "generation got stuck" is ≥15% of Recourse users, that's a P0 bug (comments already hinted at this).
 4. **Send-rate.** Q11 — what fraction of drafters actually SENT? This is your true completion metric, not just "draft generated". Ratelimit analytics can't tell you this; only self-report can.
-5. **Category signal.** Q13 (past need) vs Q14 (would-use) — where they diverge is important. If lots picked "rental agreement analyzer" in Q14 but few in Q13, it's an aspirational ask, not a proven need.
+5. **Category signal.** Q13 (past need, multi-select) vs Q14 (ranked would-use). Compute mean rank for each option in Q14 (lower = more wanted). Cross-reference with Q13 — an option that ranks top-3 in Q14 but scores low in Q13 is aspirational demand (worth building only if you can create the trigger); one that scores high on both is proven demand (build now).
 6. **WTP curves.** Q16 + Q17 — plot the price ladder. The median tells you your MVP price; the shape tells you if there's a small high-intent tier worth building for.
 7. **Trust signal.** Q18 + Q19 — % who'd upload rental agreement vs video is a direct proxy for how much data-trust you've earned. Below 40% = you have a trust-marketing problem to solve before you can ship these features.
 8. **Aha-moment themes.** Q21 — cluster free-text answers. If a common phrase emerges ("I want it done for me", "I want to know before signing"), that's your positioning.
