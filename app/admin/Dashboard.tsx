@@ -31,7 +31,9 @@ function fmtDeltaPct(v: number | null): { text: string; color: string } {
 export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
   const router = useRouter();
   useEffect(() => {
-    const id = setInterval(() => router.refresh(), 30_000);
+    // 5-min refresh (was 30s). Metrics module caches for 5 min anyway; a
+    // faster tick just burns Upstash requests without gaining fresher data.
+    const id = setInterval(() => router.refresh(), 5 * 60 * 1000);
     return () => clearInterval(id);
   }, [router]);
 
@@ -62,6 +64,28 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
       }}
     >
       <Header sinceLaunch={sinceLaunch} launchIso={launchIso} onLogout={logout} />
+
+      {!metrics.analytics_available && (
+        <div
+          role="alert"
+          style={{
+            marginBottom: 32,
+            padding: "12px 16px",
+            border: `1px solid ${NEGATIVE}`,
+            background: "rgba(224, 123, 90, 0.08)",
+            color: CREAM,
+            fontSize: 12,
+            lineHeight: 1.5,
+          }}
+        >
+          <strong style={{ color: NEGATIVE }}>Analytics unavailable.</strong>{" "}
+          Upstash rate-limit analytics query failed (usually quota exhaustion). Attempts and
+          unique-user numbers below are showing 0 because the source is offline, not because
+          traffic was zero. Counter-based metrics (completions / ratings / 5★) are still
+          live. Check the Upstash dashboard for quota; the underlying data returns once quota
+          resets or you upgrade the plan.
+        </div>
+      )}
 
       {/* HERO */}
       <section style={{ marginBottom: 56 }}>

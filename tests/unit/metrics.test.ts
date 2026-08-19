@@ -59,6 +59,11 @@ describe("buildMetrics — window + weekly bucketing", () => {
     expect(r.by_week.length).toBe(4);
   });
 
+  it("buildMetrics defaults analytics_available=true (loadMetrics overrides on failure)", () => {
+    const r = call();
+    expect(r.analytics_available).toBe(true);
+  });
+
   it("week 0 is 'This week' and ends today (2026-08-19)", () => {
     const r = call();
     const current = r.by_week[0];

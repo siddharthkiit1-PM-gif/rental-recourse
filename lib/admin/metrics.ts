@@ -81,6 +81,9 @@ export type Metrics = {
   by_week: WeeklyRow[];  // most recent first (index 0 = "This week")
   totals: Totals;        // 28-day window totals
   wow: WeekOverWeek | null;
+  analytics_available: boolean; // false when the ratelimit analytics fetch failed
+                                // (typically quota exhaustion) — UI should show a banner
+                                // and treat attempts/DAU as unknown, not zero
 };
 
 export type HourlyBucket = {
@@ -274,10 +277,26 @@ export function buildMetrics(args: {
     by_week: byWeek,
     totals,
     wow,
+    analytics_available: true, // overridden in loadMetrics on failure
   };
 }
 
-export async function loadMetrics(): Promise<Metrics> {
+// Simple process-local cache. The dashboard auto-refreshes and each refresh
+// runs a 672-bucket analytics query — cache to keep Upstash request counts
+// sane. TTL matches the "auto-refresh" cadence in the UI.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+let _cache: { metrics: Metrics; expires_at: number } | null = null;
+
+export async function loadMetrics(opts: { bypassCache?: boolean } = {}): Promise<Metrics> {
+  if (!opts.bypassCache && _cache && Date.now() < _cache.expires_at) {
+    return _cache.metrics;
+  }
+  const metrics = await loadMetricsUncached();
+  _cache = { metrics, expires_at: Date.now() + CACHE_TTL_MS };
+  return metrics;
+}
+
+async function loadMetricsUncached(): Promise<Metrics> {
   const now = Date.now();
   const rl = draftRatelimit();
   const analytics = (rl as unknown as {
@@ -285,13 +304,17 @@ export async function loadMetrics(): Promise<Metrics> {
   }).analytics;
 
   let perDayAnalytics = new Map<string, { attempts: number; ips: Set<string> }>();
+  let analyticsAvailable = true;
   if (analytics) {
     try {
       const buckets = await analytics.getUsageOverTime(HOURS_IN_WINDOW, "identifier");
       perDayAnalytics = aggregateAnalyticsPerDay(buckets);
     } catch (err) {
       console.error("[metrics] analytics fetch failed", err);
+      analyticsAvailable = false;
     }
+  } else {
+    analyticsAvailable = false;
   }
 
   const [completions, rating5, ratingsTotal] = await Promise.all([
@@ -300,15 +323,18 @@ export async function loadMetrics(): Promise<Metrics> {
     readDailyWindow("ratings_total", WINDOW_DAYS, now),
   ]);
 
+  const base = buildMetrics({
+    now,
+    perDayAnalytics,
+    completionsByDay: completions,
+    rating5ByDay: rating5,
+    ratingsTotalByDay: ratingsTotal,
+  });
+
   return {
     fetched_at: now,
-    ...buildMetrics({
-      now,
-      perDayAnalytics,
-      completionsByDay: completions,
-      rating5ByDay: rating5,
-      ratingsTotalByDay: ratingsTotal,
-    }),
+    ...base,
+    analytics_available: analyticsAvailable,
   };
 }
 
