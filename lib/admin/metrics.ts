@@ -1,5 +1,6 @@
 import { draftRatelimit } from "@/lib/session/ratelimit";
 import { readDailyWindow, istDay } from "@/lib/admin/counters";
+import { redis } from "@/lib/session/redis";
 
 const IST_OFFSET_MIN = 5 * 60 + 30;
 const ONE_DAY_MS = 86_400_000;
@@ -281,19 +282,51 @@ export function buildMetrics(args: {
   };
 }
 
-// Simple process-local cache. The dashboard auto-refreshes and each refresh
-// runs a 672-bucket analytics query — cache to keep Upstash request counts
-// sane. TTL matches the "auto-refresh" cadence in the UI.
-const CACHE_TTL_MS = 5 * 60 * 1000;
-let _cache: { metrics: Metrics; expires_at: number } | null = null;
+// Two-layer cache: (1) process-local for the fastest path on the same
+// serverless instance, (2) Redis-backed so the expensive analytics query
+// (~700 Redis commands per uncached call) hits at most once per
+// CACHE_TTL_S across ALL Vercel containers. Metrics change on the order of
+// minutes-to-hours, so a 5-min TTL is well within tolerance.
+const CACHE_TTL_S = 5 * 60;
+const CACHE_TTL_MS = CACHE_TTL_S * 1000;
+const CACHE_KEY = "recourse:cache:metrics:v1";
+
+let _local: { metrics: Metrics; expires_at: number } | null = null;
 
 export async function loadMetrics(opts: { bypassCache?: boolean } = {}): Promise<Metrics> {
-  if (!opts.bypassCache && _cache && Date.now() < _cache.expires_at) {
-    return _cache.metrics;
+  const now = Date.now();
+  if (!opts.bypassCache && _local && now < _local.expires_at) {
+    return _local.metrics;
+  }
+  if (!opts.bypassCache) {
+    const cached = await readRedisCache();
+    if (cached) {
+      _local = { metrics: cached, expires_at: now + CACHE_TTL_MS };
+      return cached;
+    }
   }
   const metrics = await loadMetricsUncached();
-  _cache = { metrics, expires_at: Date.now() + CACHE_TTL_MS };
+  _local = { metrics, expires_at: now + CACHE_TTL_MS };
+  void writeRedisCache(metrics);
   return metrics;
+}
+
+async function readRedisCache(): Promise<Metrics | null> {
+  try {
+    const raw = (await redis().get(CACHE_KEY)) as Metrics | string | null;
+    if (!raw) return null;
+    return typeof raw === "string" ? (JSON.parse(raw) as Metrics) : raw;
+  } catch {
+    return null;
+  }
+}
+
+async function writeRedisCache(metrics: Metrics): Promise<void> {
+  try {
+    await redis().setex(CACHE_KEY, CACHE_TTL_S, JSON.stringify(metrics));
+  } catch {
+    // Cache-write failures are non-critical; the metric was already returned.
+  }
 }
 
 async function loadMetricsUncached(): Promise<Metrics> {
