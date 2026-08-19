@@ -1,150 +1,174 @@
 import { describe, it, expect } from "vitest";
 import {
-  aggregateAnalytics,
+  aggregateAnalyticsPerDay,
   buildMetrics,
   type HourlyBucket,
 } from "@/lib/admin/metrics";
 
-const AUG_13_UTC_1830 = Date.parse("2026-08-13T18:30:00Z");
-const AUG_14_UTC_0000 = Date.parse("2026-08-14T00:00:00Z");
-const AUG_14_UTC_1829 = Date.parse("2026-08-14T18:29:00Z");
-const AUG_14_UTC_1831 = Date.parse("2026-08-14T18:31:00Z");
+const AUG_14_UTC_0000 = Date.parse("2026-08-14T00:00:00Z"); // 05:30 IST = Aug 14 IST
+const AUG_13_UTC_1830 = Date.parse("2026-08-13T18:30:00Z"); // 00:00 IST Aug 14
+const AUG_14_UTC_1831 = Date.parse("2026-08-14T18:31:00Z"); // 00:01 IST Aug 15
 
-const AUG_16_NOON_UTC = Date.parse("2026-08-16T12:00:00Z");
-const emptyAgg = { perDay: new Map(), totalAttempts: 0, allIps: new Set<string>() };
+// Anchor "now" at 2026-08-19 12:00 UTC = 17:30 IST → today = "2026-08-19"
+const NOW = Date.parse("2026-08-19T12:00:00Z");
 
-describe("aggregateAnalytics", () => {
+const emptyDay = new Map<string, { attempts: number; ips: Set<string> }>();
+
+describe("aggregateAnalyticsPerDay", () => {
   it("skips buckets with no identifier", () => {
-    const r = aggregateAnalytics([{ time: AUG_14_UTC_0000 }]);
-    expect(r.totalAttempts).toBe(0);
-    expect(r.allIps.size).toBe(0);
-    expect(r.perDay.size).toBe(0);
+    const r = aggregateAnalyticsPerDay([{ time: AUG_14_UTC_0000 }]);
+    expect(r.size).toBe(0);
   });
 
   it("sums attempts and dedupes IPs across buckets in the same IST day", () => {
-    const buckets: HourlyBucket[] = [
+    const r = aggregateAnalyticsPerDay([
       { time: AUG_14_UTC_0000, identifier: { "1.1.1.1": 3, "2.2.2.2": 1 } },
-      { time: AUG_14_UTC_1829, identifier: { "1.1.1.1": 2, "3.3.3.3": 5 } },
-    ];
-    const r = aggregateAnalytics(buckets);
-    expect(r.totalAttempts).toBe(11);
-    expect(r.allIps.size).toBe(3);
-    const day = r.perDay.get("2026-08-14");
+      { time: Date.parse("2026-08-14T09:00:00Z"), identifier: { "1.1.1.1": 2, "3.3.3.3": 5 } },
+    ]);
+    const day = r.get("2026-08-14");
     expect(day?.attempts).toBe(11);
     expect(day?.ips.size).toBe(3);
   });
 
   it("splits at IST midnight (18:30 UTC)", () => {
-    const buckets: HourlyBucket[] = [
-      { time: AUG_13_UTC_1830, identifier: { "9.9.9.9": 1 } }, // 2026-08-14 IST
-      { time: AUG_14_UTC_1829, identifier: { "9.9.9.9": 1 } }, // 2026-08-14 IST
-      { time: AUG_14_UTC_1831, identifier: { "8.8.8.8": 1 } }, // 2026-08-15 IST
-    ];
-    const r = aggregateAnalytics(buckets);
-    expect(r.perDay.get("2026-08-14")?.attempts).toBe(2);
-    expect(r.perDay.get("2026-08-15")?.attempts).toBe(1);
-    expect(r.allIps.size).toBe(2);
+    const r = aggregateAnalyticsPerDay([
+      { time: AUG_13_UTC_1830, identifier: { "9.9.9.9": 1 } },
+      { time: AUG_14_UTC_1831, identifier: { "8.8.8.8": 1 } },
+    ]);
+    expect(r.get("2026-08-14")?.attempts).toBe(1);
+    expect(r.get("2026-08-15")?.attempts).toBe(1);
   });
 });
 
-describe("buildMetrics", () => {
+describe("buildMetrics — window + weekly bucketing", () => {
   const call = (over: Partial<Parameters<typeof buildMetrics>[0]> = {}) =>
     buildMetrics({
-      now: AUG_16_NOON_UTC,
-      currentWeek: emptyAgg,
-      priorWeek: null,
+      now: NOW,
+      perDayAnalytics: emptyDay,
       completionsByDay: new Map(),
       rating5ByDay: new Map(),
       ratingsTotalByDay: new Map(),
       ...over,
     });
 
-  it("empty everything → today row zeroed, by_day contains only today", () => {
+  it("produces 4 weekly buckets over a 28-day window", () => {
     const r = call();
-    expect(r.window_days).toBe(7);
-    expect(r.counters_start_day).toBe("2026-08-16");
+    expect(r.window_days).toBe(28);
+    expect(r.week_size).toBe(7);
+    expect(r.week_count).toBe(4);
+    expect(r.by_week.length).toBe(4);
+  });
+
+  it("week 0 is 'This week' and ends today (2026-08-19)", () => {
+    const r = call();
+    const current = r.by_week[0];
+    expect(current.is_current).toBe(true);
+    expect(current.label).toBe("This week");
+    expect(current.week_end).toBe("2026-08-19");
+    expect(current.week_start).toBe("2026-08-13");
+  });
+
+  it("week 3 (oldest) covers Jul 23 – 29", () => {
+    const r = call();
+    const oldest = r.by_week[3];
+    expect(oldest.is_current).toBe(false);
+    expect(oldest.week_start).toBe("2026-07-23");
+    expect(oldest.week_end).toBe("2026-07-29");
+    expect(oldest.label).toContain("Jul");
+  });
+
+  it("cross-month week label uses both months", () => {
+    const r = call();
+    // Aug 6 – 12 is within one month
+    expect(r.by_week[1].label).toBe("Aug 6–12");
+    // Jul 30 – Aug 5 crosses months
+    expect(r.by_week[2].label).toBe("Jul 30 – Aug 5");
+  });
+
+  it("counters_live=true only for weeks ending on/after 2026-08-16", () => {
+    const r = call();
+    expect(r.by_week[0].counters_live).toBe(true);  // Aug 13–19, ends after
+    expect(r.by_week[1].counters_live).toBe(false); // Aug 6–12, ends before
+    expect(r.by_week[2].counters_live).toBe(false); // Jul 30–Aug 5
+    expect(r.by_week[3].counters_live).toBe(false); // Jul 23–29
+  });
+
+  it("aggregates attempts + dedupes IPs across all 7 days of a week", () => {
+    const perDay = new Map<string, { attempts: number; ips: Set<string> }>();
+    perDay.set("2026-08-13", { attempts: 10, ips: new Set(["a", "b"]) });
+    perDay.set("2026-08-15", { attempts: 5, ips: new Set(["b", "c"]) });
+    perDay.set("2026-08-19", { attempts: 2, ips: new Set(["c", "d"]) });
+    const r = call({ perDayAnalytics: perDay });
+    const current = r.by_week[0];
+    expect(current.attempts).toBe(17);
+    expect(current.unique_ips).toBe(4); // {a, b, c, d}
+  });
+
+  it("bucket totals sum completions/ratings/5★ across the week", () => {
+    const r = call({
+      completionsByDay: new Map([
+        ["2026-08-16", 3],
+        ["2026-08-17", 5],
+        ["2026-08-19", 2],
+      ]),
+      rating5ByDay: new Map([
+        ["2026-08-16", 1],
+        ["2026-08-17", 2],
+      ]),
+      ratingsTotalByDay: new Map([
+        ["2026-08-16", 2],
+        ["2026-08-17", 3],
+      ]),
+    });
+    const current = r.by_week[0];
+    expect(current.completions).toBe(10);
+    expect(current.rating_5).toBe(3);
+    expect(current.ratings_total).toBe(5);
+  });
+
+  it("totals aggregate across all 4 weeks; unique_ips is deduped across the whole window", () => {
+    const perDay = new Map<string, { attempts: number; ips: Set<string> }>();
+    // Same IP in two different weeks → counted once in window totals
+    perDay.set("2026-08-15", { attempts: 3, ips: new Set(["shared"]) });
+    perDay.set("2026-08-05", { attempts: 4, ips: new Set(["shared", "other"]) });
+    const r = call({ perDayAnalytics: perDay });
+    expect(r.totals.attempts).toBe(7);
+    expect(r.totals.unique_ips).toBe(2); // {shared, other}
+  });
+
+  it("today row reflects today's analytics + counters, with completion_rate", () => {
+    const r = call({
+      perDayAnalytics: new Map([
+        ["2026-08-19", { attempts: 8, ips: new Set(["x", "y"]) }],
+      ]),
+      completionsByDay: new Map([["2026-08-19", 4]]),
+    });
     expect(r.today).toEqual({
-      day: "2026-08-16",
-      attempts: 0,
-      unique_ips: 0,
-      completions: 0,
+      day: "2026-08-19",
+      attempts: 8,
+      unique_ips: 2,
+      completions: 4,
       rating_5: 0,
       ratings_total: 0,
-      completion_rate: null,
+      completion_rate: 0.5,
     });
-    expect(r.by_day.map((d) => d.day)).toEqual(["2026-08-16"]);
-    expect(r.totals.completion_rate).toBeNull();
-    expect(r.totals.five_star_share).toBeNull();
-    expect(r.prior).toBeNull();
   });
 
-  it("merges analytics with counter data into a joined day row", () => {
-    const buckets: HourlyBucket[] = [
-      { time: AUG_14_UTC_0000, identifier: { "1.1.1.1": 10 } },
-    ];
-    const currentWeek = aggregateAnalytics(buckets);
-    const r = call({
-      currentWeek,
-      completionsByDay: new Map([["2026-08-14", 7]]),
-      rating5ByDay: new Map([["2026-08-14", 3]]),
-      ratingsTotalByDay: new Map([["2026-08-14", 4]]),
-    });
-    const row = r.by_day.find((d) => d.day === "2026-08-14")!;
-    expect(row).toMatchObject({
-      attempts: 10,
-      unique_ips: 1,
-      completions: 7,
-      rating_5: 3,
-      ratings_total: 4,
-    });
-    expect(row.completion_rate).toBeCloseTo(0.7, 5);
-    expect(r.totals.completion_rate).toBeCloseTo(0.7, 5);
-    expect(r.totals.five_star_share).toBeCloseTo(0.75, 5);
+  it("wow compares this week (by_week[0]) vs last week (by_week[1])", () => {
+    const perDay = new Map<string, { attempts: number; ips: Set<string> }>();
+    perDay.set("2026-08-19", { attempts: 100, ips: new Set(["a"]) }); // this week
+    perDay.set("2026-08-11", { attempts: 50, ips: new Set(["b"]) });  // last week
+    const r = call({ perDayAnalytics: perDay });
+    expect(r.wow?.attempts_this).toBe(100);
+    expect(r.wow?.attempts_last).toBe(50);
+    expect(r.wow?.attempts_delta_pct).toBeCloseTo(100, 5);
   });
 
-  it("completion_rate is null when attempts is zero even if completions somehow non-zero", () => {
-    // Defensive: shouldn't happen in practice but should not divide by zero.
-    const r = call({
-      completionsByDay: new Map([["2026-08-14", 5]]),
-    });
-    const row = r.by_day.find((d) => d.day === "2026-08-14")!;
-    expect(row.completion_rate).toBeNull();
-  });
-
-  it("caps by_day to 7 rows, sorted desc", () => {
-    const completionsByDay = new Map<string, number>();
-    for (let i = 0; i < 10; i++) {
-      const day = new Date(AUG_16_NOON_UTC - i * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 10);
-      completionsByDay.set(day, i + 1);
-    }
-    const r = call({ completionsByDay });
-    expect(r.by_day.length).toBe(7);
-    for (let i = 1; i < r.by_day.length; i++) {
-      expect(r.by_day[i - 1].day > r.by_day[i].day).toBe(true);
-    }
-  });
-
-  it("computes WoW attempts delta from prior period", () => {
-    const current = aggregateAnalytics([
-      { time: AUG_14_UTC_0000, identifier: { "1.1.1.1": 200 } },
-    ]);
-    const prior = aggregateAnalytics([
-      { time: Date.parse("2026-08-05T06:00:00Z"), identifier: { "2.2.2.2": 100 } },
-    ]);
-    const r = call({ currentWeek: current, priorWeek: prior });
-    expect(r.prior?.attempts).toBe(100);
-    expect(r.prior?.unique_ips).toBe(1);
-    expect(r.prior?.attempts_delta_pct).toBeCloseTo(100, 5); // 200 vs 100 = +100%
-  });
-
-  it("WoW delta is null when prior period had zero attempts", () => {
-    const current = aggregateAnalytics([
-      { time: AUG_14_UTC_0000, identifier: { "1.1.1.1": 10 } },
-    ]);
-    const r = call({ currentWeek: current, priorWeek: emptyAgg });
-    expect(r.prior?.attempts).toBe(0);
-    expect(r.prior?.attempts_delta_pct).toBeNull();
+  it("wow delta is null when last week had zero attempts (avoid divide-by-zero)", () => {
+    const perDay = new Map<string, { attempts: number; ips: Set<string> }>();
+    perDay.set("2026-08-19", { attempts: 10, ips: new Set(["a"]) });
+    const r = call({ perDayAnalytics: perDay });
+    expect(r.wow?.attempts_last).toBe(0);
+    expect(r.wow?.attempts_delta_pct).toBeNull();
   });
 });

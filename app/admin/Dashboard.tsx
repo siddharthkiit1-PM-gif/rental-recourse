@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { Metrics } from "@/lib/admin/metrics";
+import type { Metrics, WeeklyRow } from "@/lib/admin/metrics";
 import "./admin.css";
 
 const INK = "#1a1712";
@@ -41,17 +41,14 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
     router.refresh();
   }
 
-  const { totals, prior, today, by_day, window_days, counters_start_day } = metrics;
-  const maxAttempts = Math.max(1, ...by_day.map((d) => d.attempts));
-  const delta = fmtDeltaPct(prior?.attempts_delta_pct ?? null);
+  const { totals, wow, today, by_week, window_days, week_count } = metrics;
+  const maxAttempts = Math.max(1, ...by_week.map((w) => w.attempts));
+  const wowDelta = fmtDeltaPct(wow?.attempts_delta_pct ?? null);
 
-  // Funnel drop-off percentages
-  const attemptsToCompletion = totals.attempts > 0
-    ? totals.completions / totals.attempts
-    : null;
-  const completionsToRatings = totals.completions > 0
-    ? totals.ratings_total / totals.completions
-    : null;
+  const attemptsToCompletion =
+    totals.attempts > 0 ? totals.completions / totals.attempts : null;
+  const completionsToRatings =
+    totals.completions > 0 ? totals.ratings_total / totals.completions : null;
 
   return (
     <main
@@ -68,7 +65,14 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
 
       {/* HERO */}
       <section style={{ marginBottom: 56 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", alignItems: "end", gap: 32 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "auto 1fr",
+            alignItems: "end",
+            gap: 32,
+          }}
+        >
           <span
             style={{
               fontFamily: "'Instrument Serif', ui-serif, Georgia, serif",
@@ -81,18 +85,25 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
             {fmtN(totals.attempts)}
           </span>
           <div style={{ paddingBottom: 14, display: "grid", gap: 10 }}>
-            <div style={{ fontSize: 11, letterSpacing: "0.18em", color: MUTED, textTransform: "uppercase" }}>
-              draft attempts · last {window_days} days
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                color: MUTED,
+                textTransform: "uppercase",
+              }}
+            >
+              draft attempts · last {window_count(window_days, week_count)}
             </div>
             <div style={{ fontSize: 14, color: CREAM }}>
               from <strong>{fmtN(totals.unique_ips)}</strong> unique users
-              {prior != null && (
+              {wow != null && (
                 <>
                   {" · "}
-                  <span style={{ color: delta.color, fontVariantNumeric: "tabular-nums" }}>
-                    {delta.text}
+                  <span style={{ color: wowDelta.color, fontVariantNumeric: "tabular-nums" }}>
+                    {wowDelta.text}
                   </span>
-                  <span style={{ color: MUTED }}> vs prior {window_days}d</span>
+                  <span style={{ color: MUTED }}> this week vs last</span>
                 </>
               )}
             </div>
@@ -100,6 +111,10 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
               <strong style={{ color: CREAM }}>{fmtN(totals.completions)}</strong> completions
               {" · "}
               <strong style={{ color: CREAM }}>{fmtPct(totals.completion_rate)}</strong> completion rate
+              {" · "}
+              <strong style={{ color: CREAM }}>{fmtN(totals.rating_5)}</strong>&nbsp;5★
+              {" · "}
+              <strong style={{ color: CREAM }}>{fmtPct(totals.five_star_share)}</strong> 5★ share
             </div>
           </div>
         </div>
@@ -108,7 +123,13 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
       {/* TODAY */}
       <section style={{ marginBottom: 56 }}>
         <SectionHeader>Today · {today.day}</SectionHeader>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: `1px solid ${HAIRLINE}` }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            borderTop: `1px solid ${HAIRLINE}`,
+          }}
+        >
           <Stat label="attempts" value={today.attempts.toString()} />
           <Stat label="unique IPs" value={today.unique_ips.toString()} />
           <Stat label="completions" value={today.completions.toString()} />
@@ -149,54 +170,34 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
         />
       </section>
 
-      {/* DAILY */}
+      {/* WEEKLY */}
       <section style={{ marginBottom: 40 }}>
-        <SectionHeader>Daily breakdown (IST)</SectionHeader>
+        <SectionHeader>
+          Weekly breakdown · last {week_count} weeks (IST, rolling from today)
+        </SectionHeader>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ color: MUTED, textAlign: "left" }}>
-              <Th w="14%">Day</Th>
+              <Th w="18%">Week</Th>
               <Th>Volume</Th>
               <Th w="10%" alignRight>Attempts</Th>
               <Th w="12%" alignRight>Completions</Th>
               <Th w="10%" alignRight>Comp %</Th>
-              <Th w="10%" alignRight>DAU</Th>
+              <Th w="10%" alignRight>Users</Th>
               <Th w="8%" alignRight>5★</Th>
             </tr>
           </thead>
           <tbody>
-            {by_day.length === 0 && (
+            {by_week.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ padding: 24, color: MUTED }}>
                   No traffic in the last {window_days} days.
                 </td>
               </tr>
             )}
-            {by_day.map((d) => {
-              const countersLive = d.day >= counters_start_day;
-              return (
-                <tr key={d.day} style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
-                  <td style={{ padding: "12px 0", color: CREAM }}>{d.day}</td>
-                  <td style={{ padding: "12px 0" }}>
-                    <span
-                      aria-hidden
-                      style={{
-                        display: "inline-block",
-                        height: 10,
-                        width: `${(d.attempts / maxAttempts) * 100}%`,
-                        background: AMBER,
-                        opacity: d.attempts ? 1 : 0.15,
-                      }}
-                    />
-                  </td>
-                  <Td right cream>{fmtN(d.attempts)}</Td>
-                  <Td right cream={countersLive}>{countersLive ? fmtN(d.completions) : "—"}</Td>
-                  <Td right cream={countersLive}>{countersLive ? fmtPct(d.completion_rate) : "—"}</Td>
-                  <Td right cream>{fmtN(d.unique_ips)}</Td>
-                  <Td right cream={countersLive}>{countersLive ? fmtN(d.rating_5) : "—"}</Td>
-                </tr>
-              );
-            })}
+            {by_week.map((w) => (
+              <WeeklyTableRow key={w.week_start} row={w} maxAttempts={maxAttempts} />
+            ))}
           </tbody>
         </table>
       </section>
@@ -215,18 +216,66 @@ export function Dashboard({ metrics, launchIso, sinceLaunch }: Props) {
       >
         <span>
           data · upstash ratelimit analytics (attempts, DAU) + durable counters
-          (completions, ratings, 5★) · 7-day rolling · IST buckets
+          (completions, ratings, 5★) · {window_days}-day rolling window · {week_count}× 7-day IST buckets
         </span>
         <span>
           caveats · attempts = /api/agent hits, may include user retries ·
-          DAU = unique IPs (multi-user households register as 1) ·
-          completions/ratings/5★ counters started {counters_start_day}, earlier days show "—"
+          Users = unique IPs deduped within a week (multi-user households register as 1) ·
+          completions/ratings/5★ counters started {metrics.counters_start_day}, earlier weeks show "—"
         </span>
         <span>
           fetched {new Date(metrics.fetched_at).toLocaleTimeString("en-IN")} · auto-refresh 30s
         </span>
       </footer>
     </main>
+  );
+}
+
+function window_count(windowDays: number, weekCount: number): string {
+  if (windowDays === 7) return "7 days";
+  if (windowDays === 28) return `${weekCount} weeks`;
+  if (windowDays === 30) return "30 days";
+  return `${windowDays} days`;
+}
+
+function WeeklyTableRow({ row, maxAttempts }: { row: WeeklyRow; maxAttempts: number }) {
+  const showCounter = row.counters_live;
+  return (
+    <tr style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
+      <td style={{ padding: "12px 0", color: CREAM }}>
+        {row.label}
+        {row.is_current && (
+          <span
+            style={{
+              marginLeft: 8,
+              fontSize: 9,
+              color: AMBER,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+            }}
+          >
+            live
+          </span>
+        )}
+      </td>
+      <td style={{ padding: "12px 0" }}>
+        <span
+          aria-hidden
+          style={{
+            display: "inline-block",
+            height: 10,
+            width: `${(row.attempts / maxAttempts) * 100}%`,
+            background: AMBER,
+            opacity: row.attempts ? 1 : 0.15,
+          }}
+        />
+      </td>
+      <Td right cream>{fmtN(row.attempts)}</Td>
+      <Td right cream={showCounter}>{showCounter ? fmtN(row.completions) : "—"}</Td>
+      <Td right cream={showCounter}>{showCounter ? fmtPct(row.completion_rate) : "—"}</Td>
+      <Td right cream>{fmtN(row.unique_ips)}</Td>
+      <Td right cream={showCounter}>{showCounter ? fmtN(row.rating_5) : "—"}</Td>
+    </tr>
   );
 }
 
@@ -386,7 +435,14 @@ function FunnelRow({
       <div style={{ textAlign: "right", color: CREAM, fontVariantNumeric: "tabular-nums" }}>
         {count.toLocaleString("en-IN")}
       </div>
-      <div style={{ textAlign: "right", color: MUTED, fontSize: 11, fontVariantNumeric: "tabular-nums" }}>
+      <div
+        style={{
+          textAlign: "right",
+          color: MUTED,
+          fontSize: 11,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
         {rate != null ? `${(rate * 100).toFixed(1)}% ${rateLabel}` : ""}
       </div>
     </div>
